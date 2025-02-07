@@ -13,10 +13,10 @@ This folder contains a collection of algorithmic exercises, unit tests, and theo
 - **Theoretical Notes** 
   - Summaries and key points from the software development lectures.  
 
-## 🛠 Technologies  
+## Technologies  
 - **Programming Language:** Java 
 - **Testing Framework:** JUnit 
 
 ## Disclaimer  
-I cannot guarantee that all exercises and notes are free of errors. **Critical thinking is always necessary** when reviewing and using this material. If you find any mistakes, feel free to suggest improvements! 
-
+These notes were created with the assistance of **ChatGPT** to enhance learning and provide structured explanations, and by consulting **study materials provided by SWitCH Dev professors**. 
+I cannot guarantee that all exercises and notes are free of errors. **Critical thinking is always necessary** when reviewing and using this material. If you find any mistakes, feel free to report or suggest improvements!
