@@ -11,11 +11,11 @@ This repository contains study materials, exercises, and a project related to th
 ## Course Topics
 The following topics were covered as part of the learning process, specifically in relation to the implementation of the TCP and UDP client-server programming project:
 
-# 1. Fundamental Concepts of Computational Systems
-# 2. Operating Systems
-# 3. Virtualization
-# 4. Computer Networks and Client-Server Model
-# 5. Software Development for Efficient and Reliable Systems
+1. Fundamental Concepts of Computational Systems
+2. Operating Systems
+3. Virtualization
+4. Computer Networks and Client-Server Model
+5. Software Development for Efficient and Reliable Systems
 
 
 ## Tools Used
