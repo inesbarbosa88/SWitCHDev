@@ -16,14 +16,15 @@ The following areas of competence are taught in the programme:
 
 The programme utilizes industry-standard tools and technologies, including:
 
+- **IntelliJ IDEA**
 - **Java**
+- **JUnit**
 - **JavaScript**
 - **Spring Boot**
 - **ReactJS**
 - **Jenkins**
 - **Docker**
 - **SQL**
-- **And more...**
 
 ## Objectives
 
@@ -34,16 +35,6 @@ This repository serves as a collection of materials, exercises, and projects cre
 - Study notes and resources related to each area of competence.
 - Practical exercises and solutions.
 - Final projects that demonstrate the application of acquired knowledge.
-
-## Tools Used
-
-## Tools Used
-
-- **IntelliJ IDEA**
-- **Java**
-- **JUnit**
-- **Oracle Live SQL**
-- **Spring Boot**
 
 ## Disclaimer
 
