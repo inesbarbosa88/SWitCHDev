@@ -17,4 +17,6 @@ Here you will find notes, resolution of exercises and the final project for a pr
 
 **Tools Used**
 
+- Lucidchart
 - Oracle Live SQL
+- SQL
