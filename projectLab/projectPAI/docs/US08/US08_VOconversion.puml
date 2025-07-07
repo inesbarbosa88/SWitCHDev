@@ -1,0 +1,69 @@
+@startuml
+autonumber
+skinparam sequenceMessageAlign center
+title Diagram Referenced in US08_SequenceDiagram
+
+participant "ctrl1:RegisterStudentInSystemController" as Controller #lightblue
+participant "sID:StudentID" as studentID #implementation
+participant "name1:Name" as name #motivation
+participant "nif1:NIF" as NIF #physical
+participant "phone1:Phone" as phone #technology
+participant "email1:Email" as email #business
+participant "street1:Street" as street #strategy
+participant "pc1:PostalCode" as postalCode #application
+participant "l1:Location" as location #implementation
+participant "c1:Country" as country #motivation
+participant "aE1:StudentAcademicEmail" as academicEmail #physical
+
+activate Controller
+Controller -> studentID** : create StudentID VO (uniqueNumber)
+activate studentID
+studentID --> Controller : studentID VO
+deactivate studentID
+
+Controller -> name** : create Name VO (name)
+activate name
+name --> Controller : name VO
+deactivate name
+
+Controller -> NIF**: create NIF VO (NIF)
+activate NIF
+NIF --> Controller: NIF VO
+deactivate NIF
+
+Controller -> phone** : create Phone VO (phone)
+activate phone
+phone --> Controller : phone VO
+deactivate phone
+
+Controller -> email** : create Email VO (email)
+activate email
+email --> Controller : email VO
+deactivate email
+
+Controller -> street** : create Street VO (street)
+activate street
+street --> Controller : Street VO
+deactivate street
+
+Controller -> postalCode** : create PostalCode VO (postalCode)
+activate postalCode
+postalCode --> Controller : PostalCode VO
+deactivate postalCode
+
+Controller -> location** : create Location VO (location)
+activate location
+location --> Controller : Location VO
+deactivate location
+
+Controller -> country** : create Country VO (country)
+activate country
+country --> Controller : Country VO
+deactivate country
+
+Controller -> academicEmail** : create StudentAcademicEmail VO (uniqueNumber)
+activate academicEmail
+academicEmail --> Controller : StudentAcademicEmail VO
+deactivate academicEmail
+
+@enduml

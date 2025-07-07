@@ -1,0 +1,13 @@
+@startuml
+participant ":IProgrammeEnrolmentRepository" as ProgrammeEnrolmentRepository
+participant ":ProgrammeEnrolment" as ProgrammeEnrolment
+
+ProgrammeEnrolmentRepository -> ProgrammeEnrolmentRepository : findAll()
+ProgrammeEnrolmentRepository <-- ProgrammeEnrolmentRepository : EnrolmentList
+
+loop for each ProgrammeEnrolment
+    ProgrammeEnrolmentRepository -> ProgrammeEnrolment : hasSameStudent(studentID)
+
+    ProgrammeEnrolmentRepository -> ProgrammeEnrolment : hasSameProgramme(programmeID)
+end
+@enduml

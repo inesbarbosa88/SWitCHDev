@@ -1,0 +1,50 @@
+@startuml
+autonumber
+skinparam sequenceMessageAlign center
+skinparam sequenceLifeLineBackgroundColor lightblue
+title Diagram Referenced in US15_SequenceDiagram
+
+participant ":TeacherCareerProgressionRepoImpl" as TCPRepo #lightblue
+participant ":TeacherCareerProgressionFactory" as TCPFactory #lightblue
+participant ":TeacherCareerProgressionMapperImpl" as TCPMapper #lightblue
+participant "dateVO:Date" as DateVO #lightblue
+participant "workingPercentageVO:WorkingPercentage" as WPVO #lightblue
+participant "teacherCategoryVO:TeacherCategory" as TCVO #lightblue
+participant "TeacherIDVO:TeacherID" as TID #lightblue
+participant ":TeacherCareerProgressionFactory" as TCPFactory #lightblue
+participant "lastTCP:TeacherCareerProgression" as TCP #lightblue
+
+TCPRepo -> TCPFactory : createTeacherCareerProgressionFromDataModel
+activate TCPFactory
+TCPFactory --> TCPMapper: toDomain
+deactivate TCPFactory
+activate TCPMapper
+TCPMapper -> DateVO : createDateVO(date)
+activate DateVO
+DateVO --> TCPMapper : dateVO
+deactivate DateVO
+TCPMapper --> WPVO : createWorkingPercentageVO(workingPercentage)
+activate WPVO
+WPVO --> TCPMapper : workingPercentageVO
+deactivate WPVO
+TCPMapper -> TCVO : createTeacherCategoryVO(teacherCategory)
+activate TCVO
+TCVO --> TCPMapper : teacherCategoryVO
+deactivate TCVO
+TCPMapper -> TID : createTeacherIDVO(teacherID)
+activate TID
+TID --> TCPMapper : teacherIDVO
+deactivate TID
+
+TCPMapper -> TCPFactory : createTeacherCareerProgression(dateVO, workingPercentageVO, teacherCategoryVO, teacherIDVO)
+activate TCPFactory
+TCPFactory -> TCP : createTeacherCareerProgression
+activate TCP
+TCP --> TCPFactory: lastTCP
+deactivate TCP
+TCPFactory --> TCPMapper : lastTCP
+deactivate TCPFactory
+TCPMapper --> TCPRepo
+deactivate TCPMapper
+
+@enduml

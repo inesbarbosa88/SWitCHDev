@@ -1,0 +1,61 @@
+@startuml
+actor RUC
+participant ":UI" as UI
+participant ":US22_iWantToGradeAStudentInACourseEditionController" as ctr
+participant "g1:Grade «Value Object»" as G
+participant ":LocalDate «ValueObject»" as D
+participant ":StudentRepository" as SR
+participant ":CourseEditionRepository" as CER
+participant ":CourseEditionID «ValueObject»" as CE
+participant ":CourseEditionEnrolmentRepository" as CEER
+participant ":GradeStudentRepository" as GR
+participant ":GradeStudentFactory" as GSF
+
+
+participant "gs1:StudentGrade" as GS
+
+autonumber
+
+RUC -> UI ++ #application: I want to grade a Student in a Course Edition
+UI --> RUC --: Grade, Date, CourseEdition, Student?
+RUC -> UI ++ #application: Grade, Date, CourseEdition, Student!
+UI -> ctr ++ #application : Register StudentGrade (Grade, Date, Student, CourseEdition)
+create G
+ctr -> G ++ #application : <Create> new(grade)
+G -> G : isGradeValid()
+G -> ctr :  gradeVO1
+deactivate G
+create D
+ctr -> D ++ #application : <Create> new(Date)
+D -> D : isDateValid()
+D --> ctr : dateVO1
+deactivate D
+ctr -> SR ++ #application : findStudentID (Student)
+SR -> SR : findIdByStudent (Student)
+SR -> ctr :  studentID1
+deactivate SR
+ctr -> CER ++ #application : findCourseEditionID (CourseEdition)
+CER -> CER : findIdByCourseEdition (CourseEdition)
+CER -> ctr :  courseEditionID1
+deactivate CER
+
+ctr -> CEER ++ #application : isStudentEnrolledInCourseEdition (studentID1, courseEditionID1)
+CEER --> ctr -- : true
+
+
+ctr -> GR ++ #application : addGradeToStudent (gradeVO1,dateVO1,studentID1,courseEditionID1)
+GR -> GR : !hasStudentAlreadyGradeAtThisCourseEdition(studentID1,courseEditionID1)
+GR -> GSF ++ #application : newStudentGrade (gradeVO1,dateVO1,studentID1,courseEditionID1)
+
+create GS
+GSF -> GS ++ #application : <Create> (gradeVO1,dateVO1,studentID1,courseEditionID1)
+GS --> GSF -- : true
+GSF --> GR -- : true
+
+
+GR -> GR : addGrade(true)
+GR --> ctr --: true
+ctr --> UI --: true
+UI --> RUC --: Succeed
+
+@enduml

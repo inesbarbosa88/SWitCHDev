@@ -1,0 +1,197 @@
+@startuml
+title US23: I want to know the approval percentage of a CourseEdition
+'left to right direction
+
+class US23_IWantToKnowTheApprovalPercentageOfACourseEdition  {
+    +US23_IWantToKnowTheApprovalPercentageOfACourseEdition(gradeStudentRepository : GradeStudentRepository)
+    +IWantToKnowTheApprovalPercentageOfACourseEdition(courseEdition : CourseEdition): double
+    +findCourseEditionIdByCourseEdition (courseEdition : CourseEdition)
+}
+
+interface IStudentGradeRepository {
+    +addGradeToStudent(grade: Grade, date: LocalDate, studentID: StudentID, courseEditionID: CourseEditionID): Optional<StudentGrade>
+    +knowAverageGrade(courseEditionID: CourseEditionID): Double
+    +knowApprovalRate(courseEditionID: CourseEditionID): double
+    +findIdByStudent (StudentGrade studentGrade)
+    +save(StudentGrade entity)
+    +findAll()
+    +ofIdentity(StudentGradeID id)
+    +containsOfIdentity(StudentGradeID id)
+
+}
+
+package "StudentGrade" {
+entity "<<root>>\nStudentGrade" {
+    -_grade: Grade
+    -_date: LocalDate
+    -_studentGradeID: StudentGradeID
+    -_studentID: StudentID
+    -_courseEditionID: CourseEditionID
+    +hasThisCourseEdition(courseEditionID : CourseEditionID): boolean
+    +knowCourseEdition()
+    +get_student()
+    +get_courseEdition()
+    +equals(o: Object): boolean
+
+    }
+}
+
+class Grade <<ValueObject>> {
+     -grade: double
+        +knowGrade()
+    }
+
+    class Date <<ValueObject>> {
+    -LocalDate
+    +Date(LocalDate localDate)
+    +LocalDate getLocalDate()
+    +Date now()
+    +isBefore(Date other)
+    +isAfter(Date other)
+    +equals(Object o)
+    }
+
+class StudentGradeID <<ValueObject>> {
+    -_courseEditionID
+    -_studentID
+}
+
+class StudentGradeRepository {
+    -gradeStudentList: List<GradeStudent>
+    - _gradeStudentFactory: GradeStudentFactory
+    +addGradeToStudent(Grade, Date , Student, Course Edition)
+    +knowAverageGrade(Course Edition)
+    +knowApprovalRate(Course Edition)
+    +findIdByStudent (StudentGrade studentGrade)
+    +save(StudentGrade entity)
+    +findAll()
+    +ofIdentity(StudentGradeID id)
+    +containsOfIdentity(StudentGradeID id)
+
+}
+
+
+class StudentGradeFactoryImpl {
+    +newGradeStudent()
+}
+class List<GradeStudent> {
+
+}
+
+class StudentGradeFactoryImpl {
+    +newArrayList()
+}
+
+class StudentGradeListFactoryImpl {
+    +newArrayList(): ArrayList<StudentGrade>
+}
+
+interface IStudentGradeListFactory {
+    +newArrayList(): ArrayList<StudentGrade>
+}
+
+interface IStudentGradeFactory {
+    +newStudentGrade(grade: Grade, date: LocalDate, studentID: StudentID, courseEditionID: CourseEditionID): StudentGrade
+}
+
+package "Student" {
+class "<<root>>\nStudent" {
+    -_studentID: StudentID
+    -_name: Name
+    -_nif: NIF
+    -_phone: Phone
+    -_email: Email
+    -_institutionalEmail: InstitutionalEmail
+    -_address: Address
+    +hasSameUniqueNumber(student: Student): boolean
+    +hasSameNIF((student: Student): boolean
+    +getUniqueNumber(): String
+    +hasThisUniqueNumber(student: Student): boolean
+    }
+}
+
+class Name <<ValueObject>> {
+    -Name : String
+                        +getName()
+                        +equals()
+                        +hashCode()
+    }
+
+    class NIF <<ValueObject>> {
+    -NIF : String
+    }
+
+    class Phone <<ValueObject>> {
+    -CountryCode: String
+                             -Number: String
+    }
+
+    class Email <<ValueObject>> {
+   -Email: String
+    }
+
+    class InstitutionalEmail <<ValueObject>> {
+    -_institutionalEmail: String
+    }
+
+    class Address <<ValueObject>> {
+     -Street
+                             -PostalCode
+                             -Location
+                             -Country
+    }
+
+class StudentID <<ValueObject>> {
+    -uniqueNumber: int
+    +equals()
+    +getUniqueNumber()
+    +isEquals()
+}
+package "CourseEdition" {
+class "<<root>>\nCourseEdition" {
+    -_courseEditionID: CourseEditionID
+    +equals(objectToCompare: Object): boolean
+    +setRuc(Teacher: ruc): boolean
+    +whatProgrammeEditionBelongsThisCourseEdition()
+    +getCourse()
+    }
+}
+
+class CourseEditionID <<ValueObject>> {
+   -ProgrammeEdiitionID
+   -CourseInStudyPlanID
+   +toString()
+   +equals()
+}
+
+"<<root>>\nStudentGrade" "*" --> "1" Grade
+"<<root>>\nStudentGrade" "*" --> "1" Date
+"<<root>>\nStudentGrade" --> "1" StudentID: belongs
+"<<root>>\nStudentGrade" --> "1" StudentGradeID
+"<<root>>\nStudentGrade" -up-> "1" CourseEditionID : refers to
+"<<root>>\nStudent" "*" --> "1" Name
+"<<root>>\nStudent" "*" --> "1" NIF
+"<<root>>\nStudent" "*" --> "1" Email
+"<<root>>\nStudent" "*" --> "1" Phone
+"<<root>>\nStudent" "*" --> "1" Address
+"<<root>>\nStudent" "*" --> "1" StudentID
+"<<root>>\nStudent" "*" --> "1" InstitutionalEmail
+IStudentGradeRepository "1" ....> IStudentGradeFactory
+IStudentGradeRepository "1" ....>  IStudentGradeListFactory
+IStudentGradeFactory "1" ....> "Creates" "<<root>>\nStudentGrade"
+StudentGradeListFactoryImpl ..|>  IStudentGradeListFactory
+IStudentGradeFactory  <|..  StudentGradeFactoryImpl
+IStudentGradeListFactory ..|> List
+"<<root>>\nStudentGrade" <-- List
+StudentGradeRepository <|.. IStudentGradeRepository
+List <-- IStudentGradeRepository
+
+"<<root>>\nCourseEdition" --> "1" CourseEditionID
+
+IStudentGradeRepository "1" ....> "*" "<<root>>\nStudentGrade"
+
+US23_IWantToKnowTheApprovalPercentageOfACourseEdition "1" ..> "1" StudentGradeRepository
+
+
+
+@enduml

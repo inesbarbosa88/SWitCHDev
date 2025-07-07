@@ -1,0 +1,186 @@
+@startuml
+autonumber
+skinparam sequence {
+LifeLineBorderColor Grey
+LifeLineBackgroundColor HoneyDew
+}
+title US17 - enrol a student in a programme in a given school year and in a set of courses
+actor ASC
+participant ":UI" as UI
+ASC -> UI : I want to enrol a student in a programme in \n a given school year and in a set of courses.
+activate UI
+UI --> ASC : What student?
+deactivate UI
+ASC -> UI : Enter the student!
+
+'' Get Programmes
+
+activate UI
+participant ":US17_EnrolStudentInProgrammeEdition\nAndSetOfCoursesEditionsController" as Controller
+UI -> Controller : getAllProgrammesIDs()
+activate Controller
+participant ":IProgrammeService" as IProgrammeService
+Controller -> IProgrammeService : getAllProgrammesIDs()
+participant ":IProgrammeRepository" as IProgrammeRepository
+activate IProgrammeService
+IProgrammeService -> IProgrammeRepository : getAllProgrammesIDs()
+activate IProgrammeRepository
+ref over IProgrammeRepository
+    SD getAllProgrammesIDs
+end ref
+IProgrammeRepository --> IProgrammeService : listOfProgrammesIDs
+deactivate IProgrammeRepository
+IProgrammeService --> Controller : listOfProgrammesIDs
+deactivate IProgrammeService
+Controller --> UI : listOfProgrammesIDs
+deactivate Controller
+UI --> ASC : Here is the list of Programmes!\nWhat programme do you want?
+deactivate UI
+ASC -> UI : Enter the programme!
+
+'' Get SchoolYears
+
+activate UI
+UI -> Controller : getAllSchoolYearsIDs()
+activate Controller
+participant ":ISchoolYearService" as ISchoolYearService
+Controller -> ISchoolYearService : getAllSchoolYearsIDs()
+participant ":ISchoolYearRepository" as ISchoolYearRepository
+activate ISchoolYearService
+ISchoolYearService -> ISchoolYearRepository : getAllSchoolYearsIDs()
+activate ISchoolYearRepository
+ref over ISchoolYearRepository
+    SD getAllSchoolYearsIDs
+end ref
+ISchoolYearRepository --> ISchoolYearService: listOfSchoolYearsIDs
+deactivate ISchoolYearRepository
+ISchoolYearService --> Controller : listOfSchoolYearsIDs
+deactivate ISchoolYearService
+Controller --> UI : listOfSchoolYearsIDs
+deactivate Controller
+UI --> ASC : Here is the list SchoolYears!\nWhat schoolYear do you want?
+deactivate UI
+ASC -> UI : Enter the schoolYear!
+activate UI
+UI --> ASC : Sure?
+deactivate UI
+ASC -> UI : Yes!
+
+activate UI
+UI -> Controller : enrolStudentInProgrammeEditionAndSetOfCourses\nEditions(studentID, programmeID, schoolYearID)
+ref over Controller
+    SD Convert studentID, programmeID and schoolYearID to VO
+end ref
+activate Controller
+participant ":IProgrammeEditionEnrolmentService" as IProgrammeEditionEnrolmentService
+Controller -> IProgrammeEditionEnrolmentService : enrolStudentInProgrammeEditionAndSetOfCourses\nEditions(studentID, programmeID, schoolYearID)
+activate IProgrammeEditionEnrolmentService
+'' Is Student Enrolled
+participant ":IProgrammeEnrolmentRepository" as IProgrammeEnrolmentRepository
+IProgrammeEditionEnrolmentService -> IProgrammeEnrolmentRepository : isStudentEnrolled(studentID, programmeID)
+activate IProgrammeEnrolmentRepository
+ref over IProgrammeEnrolmentRepository
+    SD isStudentEnrolled (studentID, programmeID)
+end ref
+IProgrammeEnrolmentRepository --> IProgrammeEditionEnrolmentService : True
+deactivate IProgrammeEnrolmentRepository
+IProgrammeEditionEnrolmentService --> Controller : True
+deactivate IProgrammeEditionEnrolmentService
+
+'' Find Programme Edition by SchoolYear and Programme
+participant ":IProgrammeEditionRepository" as IProgrammeEditionRepository
+Controller -> IProgrammeEditionEnrolmentService
+activate IProgrammeEditionEnrolmentService
+IProgrammeEditionEnrolmentService -> IProgrammeEditionRepository : findProgrammeEditionIDProgrammeIDAnd\nSchoolYearID(programmeID, schoolYearID)
+activate IProgrammeEditionRepository
+ref over IProgrammeEditionRepository
+    SD findProgrammeEditionBySchoolYearAndProgramme (programmeID, schoolYearID)
+end ref
+IProgrammeEditionRepository --> IProgrammeEditionEnrolmentService :  peID
+deactivate IProgrammeEditionRepository
+IProgrammeEditionEnrolmentService --> Controller : peID
+deactivate IProgrammeEditionEnrolmentService
+
+'' Is Student Enrolled in This Programme Edition
+
+participant ":IProgrammeEditionEnrolmentRepository" as IProgrammeEditionEnrolmentRepository
+Controller -> IProgrammeEditionEnrolmentService : isStudentEnrolledInThis\nProgrammeEdition(studentID, peID)
+activate IProgrammeEditionEnrolmentService
+IProgrammeEditionEnrolmentService ->  IProgrammeEditionEnrolmentRepository
+activate IProgrammeEditionEnrolmentRepository
+ref over IProgrammeEditionEnrolmentRepository
+    SD isStudentEnrolledInThisProgrammeEdition (studentID, peID)
+end ref
+IProgrammeEditionEnrolmentRepository --> IProgrammeEditionEnrolmentService : False
+deactivate IProgrammeEditionEnrolmentRepository
+IProgrammeEditionEnrolmentService --> Controller : False
+deactivate IProgrammeEditionEnrolmentService
+
+'' Enroll Student in Programme Edition
+Controller -> IProgrammeEditionEnrolmentService : enrollStudentInProgramme\nEdition(studentID, peID)
+activate IProgrammeEditionEnrolmentService
+IProgrammeEditionEnrolmentService -> IProgrammeEditionEnrolmentRepository : enrollStudentInProgrammeEdition(studentID, peID)
+activate IProgrammeEditionEnrolmentRepository
+ref over IProgrammeEditionEnrolmentRepository
+    SD Convert ProgrammeEditionEnrolment to DataModel
+end ref
+
+participant ":IProgrammeEditionEnrolmentSpringDataJPA" as peeJPAInterface
+
+' database save
+
+IProgrammeEditionEnrolmentRepository -> peeJPAInterface: save (peeDataModel : ProgrammeEditionEnrolmentDataModel)
+activate peeJPAInterface
+
+' persistence ok
+
+peeJPAInterface --> IProgrammeEditionEnrolmentRepository: True
+deactivate peeJPAInterface
+
+IProgrammeEditionEnrolmentRepository --> IProgrammeEditionEnrolmentService: True
+deactivate IProgrammeEditionEnrolmentRepository
+
+IProgrammeEditionEnrolmentService --> Controller: True
+deactivate IProgrammeEditionEnrolmentService
+
+
+'' Find Course Edition by Programme Edition
+
+participant ":ICourseEditionRepository" as ICourseEditionRepository
+Controller -> IProgrammeEditionEnrolmentService : findCourseEditionsByProgrammeEdition(peeID)
+activate IProgrammeEditionEnrolmentService
+IProgrammeEditionEnrolmentService -> ICourseEditionRepository : findCourseEditionsByProgrammeEdition(peeID)
+activate ICourseEditionRepository
+ref over ICourseEditionRepository
+    SD toFind CourseEdition by PE
+end ref
+ICourseEditionRepository -> ICourseEditionEnrolmentRepository: enrolStudentInACourse\nEdition(studentId, cee)
+activate ICourseEditionEnrolmentRepository
+
+ref over ICourseEditionEnrolmentRepository
+    SD Convert CourseEditionEnrolment to DataModel
+end ref
+
+participant ":ICourseEditionEnrolmentSpringDataJPA" as ICourseEditionEnrolmentSpringDataJPA
+
+' database save
+
+ICourseEditionEnrolmentRepository -> ICourseEditionEnrolmentSpringDataJPA: save (ceeDataModel : CourseEditionEnrolmentDataModel)
+activate ICourseEditionEnrolmentSpringDataJPA
+
+' persistence ok
+
+ICourseEditionEnrolmentSpringDataJPA --> ICourseEditionEnrolmentRepository: True
+deactivate ICourseEditionEnrolmentSpringDataJPA
+ICourseEditionEnrolmentRepository --> ICourseEditionRepository: True
+deactivate ICourseEditionEnrolmentRepository
+ICourseEditionRepository --> IProgrammeEditionEnrolmentService: True
+deactivate ICourseEditionRepository
+IProgrammeEditionEnrolmentService --> Controller: True
+deactivate IProgrammeEditionEnrolmentService
+Controller --> UI : True
+deactivate Controller
+UI --> ASC: OK!
+deactivate UI
+
+@enduml

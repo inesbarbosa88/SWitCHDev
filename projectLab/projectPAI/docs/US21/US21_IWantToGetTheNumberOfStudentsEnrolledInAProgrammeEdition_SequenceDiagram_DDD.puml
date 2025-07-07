@@ -1,0 +1,34 @@
+@startuml US21
+
+skinparam ParticipantBackgroundColor #application
+skinparam SequenceLifeLineBackgroundColor #application
+skinparam RefBorderColor #application
+
+actor ASC
+participant UI
+participant ":IWantToKnowTheNumberOfStudents\nEnrolledInAProgrammeEditionController" as CTR
+participant "<<interface>>\nIProgrammeEditionEnrolmentRepository"  as IPEER
+
+autonumber
+skinparam titleFontSize 18
+
+title: SEQUENCE DIAGRAM\nUS21_GET THE NUMBER OF STUDENTS ENROLLED IN A PROGRAMME EDITION (HAPPY PATH)
+
+ASC -> UI ++ :  I want to get the number of students enrolled in a programme edition!
+UI --> ASC -- :Which Programme Edition?
+ASC -> UI ++ : This Programme Edition
+UI -> CTR ++ : getTheNumberOfStudentsEnrolled\nInAProgrammeEdition(programmeEditionDTO)
+
+ref over CTR
+    Convert DTO 2 VO
+end ref
+
+CTR -> IPEER ++ : getTheNumberOfStudentsEnrolled\nInAProgrammeEdition(programmeEditionId)
+IPEER --> CTR --: int
+
+CTR --> "UI" --  : int
+
+UI --> ASC -- : This is the number of Students in the selected ProgrammeEdition, int.
+@enduml
+
+

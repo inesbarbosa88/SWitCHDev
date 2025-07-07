@@ -1,0 +1,87 @@
+@startuml
+!pragma layout smetana
+
+'===============================
+' CONTROLLER
+'===============================
+class US12_iWantToChangeProgrammeDirectorOfProgrammeController {
+    +US12_iWantToChangeProgrammeDirectorOfProgrammeController(service : IProgrammeService)
+    +changeProgrammeDirector() : boolean
+}
+
+'===============================
+' SERVICE
+'===============================
+class ProgrammeService {
+    +changeProgrammeDirector: boolean
+}
+
+'===============================
+' REPOSITORY
+'===============================
+interface IProgrammeRepository {
+    +getProgrammeById(programmeId : ProgrammeId): DataModel <Programme>
+    +changeProgrammeDirector(programme: Programme, newDirector: TeacherId): boolean
+}
+
+class ProgrammeRepositoryImpl {
+    +getProgrammeById(programmeId : ProgrammeId): DataModel <Programme>
+    +changeProgrammeDirector(programme: Programme, newDirector: TeacherId): boolean
+}
+
+interface ITeacherRepository {
+    +getTeacherById(teacherId : TeacherId): DataModel <Teacher>
+}
+
+class TeacherRepositoryImpl {
+    +getTeacherById(teacherId : TeacherId): DataModel <Teacher>
+}
+
+interface IProgrammeFactory {
+    +registerProgramme(...): Programme
+}
+
+'===============================
+' DOMAIN PACKAGES
+'===============================
+package "Programme" {
+    class "<<root>>\nProgramme" {
+        -_name
+        -_acronym
+        -_quantityOfEcts
+        -_quantityOfSemesters
+        -_programmeID
+        -_degreeTypeID
+        -_departmentID
+        +equals(o: Object): boolean
+        +isEquals(programme: Programme): boolean
+        +newProgrammeDirector(teacherDirectorId: TeacherId): boolean
+        +isInDepartment(department: Department): boolean
+        +getQuantityOfSemester(): int
+        +getQuantityOfEcts(): int
+        +getAcronym(): String
+        +getProgrammeName(): String
+        +calculateNumberOfYears(quantityOfSemesters : int): int
+        +hasThisProgrammeName(String : name): boolean
+    }
+}
+
+class "TeacherId" {
+    -_teacherId: String
+}
+
+'===============================
+' RELATIONS
+'===============================
+US12_iWantToChangeProgrammeDirectorOfProgrammeController --> ProgrammeService
+ProgrammeService --> IProgrammeRepository
+ProgrammeService --> IProgrammeFactory
+ProgrammeService --> ITeacherRepository
+
+ProgrammeRepositoryImpl ..|> IProgrammeRepository
+TeacherRepositoryImpl ..|> ITeacherRepository
+IProgrammeFactory ..> "<<root>>\nProgramme"
+
+"<<root>>\nProgramme" --> TeacherId : <<Programme Director>>
+
+@enduml

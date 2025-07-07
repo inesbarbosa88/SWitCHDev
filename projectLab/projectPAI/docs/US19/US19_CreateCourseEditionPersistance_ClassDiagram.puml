@@ -1,0 +1,295 @@
+@startuml
+skinparam linetype ortho
+skinparam ranksep 150
+skinparam nodesep 120
+top to bottom direction
+
+'--- Controller ---
+
+package Controller{
+    class US19_CreateCourseEditionController <<controller>> {
+        + US19_CreateCourseEditionController(degreeTypeService: IDegreeTypeService, programmeService: IProgrammeService, studyPlanService: IStudyPlanService,
+        courseInStudyPlanService: ICourseInStudyPlanService, programmeEditionService: IProgrammeEditionService, courseEditionService: ICourseEditionService)
+        + getAllDegreeTypes() : List<DegreeType>
+        + getAllProgrammes() : List<Programme>
+        + getAllProgrammeEditions() : List<ProgrammeEdition>
+        + getAllCoursesInAStudyPlan(studyPlanID : StudyPlantID)
+        + createCourseEdition (courseInStudyPlanID: CourseInStudyPlanID, programmeEditionID: ProgrammeEditionID)
+    }
+}
+
+'--- Services & Interfaces ---
+package Service {
+    'skinparam PackageBorderColor White
+    interface IDegreeTypeService
+        class DegreeTypeService
+    interface IProgrammeService
+        class ProgrammeService
+    interface IStudyPlanService
+        class StudyPlanService
+    interface ICourseInStudyPlanService
+        class CourseInStudyPlanService
+    interface IProgrammeEditionService
+        class ProgrammeEditionService
+    interface ICourseEditionService
+        class CourseEditionService
+}
+
+'--- Factories & Interfaces ---
+package Factories {
+    together{
+    interface IDegreeTypeFactory
+    class DegreeTypeImpl
+    }
+
+    together{
+    interface IProgrammeFactory
+    class ProgrammeImpl
+    }
+
+    together{
+    interface IStudyPlanFactory
+    class StudyPlanImpl
+    }
+
+    together{
+    interface ICourseInStudyPlanFactory
+    class CourseInStudyPlanImpl
+    }
+
+    together{
+    interface IProgrammeEditionFactory
+    class ProgrammeEditionImpl
+    }
+
+    together{
+    interface ICourseEditionFactory
+    class CourseEditionImpl
+    }
+}
+
+'--- Repositories & Interfaces---
+package Repository {
+    together{
+    interface IDegreeTypeRepository
+    interface IDegreeTypeRepositorySpringData
+    class DegreeTypeRepositorySpringData
+    }
+
+    together{
+    interface IProgrammeRepository
+    interface IProgrammeRepositorySpringData
+    class ProgrammeRepositorySpringData
+    }
+
+    together{
+    interface IStudyPlanRepository
+    interface IStudyPlanRepositorySpringData
+    class StudyPlanRepositorySpringData
+    }
+
+    together{
+    interface ICourseInStudyPlanRepository
+    interface ICourseInStudyPlanRepositorySpringData
+    class CourseInStudyPlanRepositorySpringData
+    }
+
+    together{
+    interface IProgrammeEditionRepository
+    interface IProgrammeEditionRepositorySpringData
+    class ProgrammeEditionRepositorySpringData
+    }
+
+    together{
+    interface ICourseEditionRepository
+    interface ICourseEditionRepositorySpringData
+    class CourseEditionRepositorySpringData
+    }
+
+    Interface JpaRepository
+}
+
+'--- Mappers & DataModels ---
+package Mappers {
+
+    together {
+    interface IDegreeTypeMapper
+    class DegreeTypeMapper
+    class DegreeDataModel
+    }
+
+    together {
+    interface IProgrammeMapper
+    class ProgrammeMapper
+    class ProgrammeDataModel
+    }
+
+    together {
+    interface IStudyPlanMapper
+    class StudyPlanMapper
+    class StudyPlanDataModel
+    }
+
+    together {
+    interface ICourseInStudyPlanMapper
+    class CourseInStudyPlanMapper
+    class CourseInStudyPlanDataModel
+    }
+
+    together {
+    interface IProgrammeEditionMapper
+    class ProgrammeEditionMapper
+    class ProgrammeEditionDataModel
+    }
+
+    together {
+    interface ICourseEditionMapper
+    class CourseEditionMapper
+    class CourseEditionDataModel
+    }
+}
+
+'--- Aggregates---
+package Aggregates {
+    entity "<<Root>>\n<<Entity>>\nDegreeType"{}
+
+    entity "<<Root>>\n<<Entity>>\nProgramme"{}
+
+    entity "<<Root>>\n<<Entity>>\nStudyPlan"{}
+
+    entity "<<Root>>\n<<Entity>>\nCourseInStudyPlan"{}
+
+    entity "<<Root>>\n<<Entity>>\nProgrammeEdition"{}
+
+    entity "<<Root>>\n<<Entity>>\nCourseEdition"{}
+}
+
+'---ValueObjects---
+package ValueObjects {
+
+    class DegreeTypeID
+    class ProgrammeID
+    class StudyPlanID
+    class CourseInStudyPlanID
+    class ProgrammeEditionID
+    class CourseEditionID
+}
+
+Controller -[#white]- Service
+Service --[#white]--- Repository
+Service -[#white]- Factories
+Repository -[#white]--- Aggregates
+Repository -[#white]- Mappers
+Aggregates -[#white]- ValueObjects
+
+' Services implement interfaces
+IDegreeTypeService <|.. DegreeTypeService : implements
+IProgrammeService <|.. ProgrammeService : implements
+IStudyPlanService <|.. StudyPlanService : implements
+ICourseInStudyPlanService <|.. CourseInStudyPlanService : implements
+IProgrammeEditionService <|.. ProgrammeEditionService : implements
+ICourseEditionService <|.. CourseEditionService : implements
+
+' Controller uses Services Interfaces
+US19_CreateCourseEditionController "1" ..> "*" ICourseEditionService : uses
+US19_CreateCourseEditionController "1" ..> "*" IProgrammeEditionService : uses
+US19_CreateCourseEditionController "1" ..> "*" ICourseInStudyPlanService : uses
+US19_CreateCourseEditionController "1" ..> "*" IStudyPlanService : uses
+US19_CreateCourseEditionController "1" ..> "*" IProgrammeService : uses
+US19_CreateCourseEditionController "1" ..> "*" IDegreeTypeService : uses
+
+'RepositoriesSpring implements IRepositoriesSpring
+'DegreeType
+DegreeTypeRepositorySpringData "*" ..|> "1" IDegreeTypeRepository : implements
+DegreeTypeRepositorySpringData "*" ..> "1" IDegreeTypeRepositorySpringData : uses
+IDegreeTypeRepositorySpringData "1" --|> "1" JpaRepository : extends
+
+'Programme
+ProgrammeRepositorySpringData "*" ..|> "1" IProgrammeRepository : implements
+ProgrammeRepositorySpringData "*" ..> "1" IProgrammeRepositorySpringData : uses
+IProgrammeRepositorySpringData "1" --|> "1" JpaRepository : extends
+
+'StudyPlan
+StudyPlanRepositorySpringData "*" ..|> "1" IStudyPlanRepository : implements
+StudyPlanRepositorySpringData "*" ..> "1" IStudyPlanRepositorySpringData : uses
+IStudyPlanRepositorySpringData "1" --|> "1" JpaRepository : extends
+
+'CourseInStudyPlan
+CourseInStudyPlanRepositorySpringData "*" ..|> "1" ICourseInStudyPlanRepository : implements
+CourseInStudyPlanRepositorySpringData "*" ..> "1" ICourseInStudyPlanRepositorySpringData : uses
+ICourseInStudyPlanRepositorySpringData "1" --|> "1" JpaRepository : extends
+
+'ProgrammeEdition
+ProgrammeEditionRepositorySpringData "*" ..|> "1" IProgrammeEditionRepository : implements
+ProgrammeEditionRepositorySpringData "*" ..> "1" IProgrammeEditionRepositorySpringData : uses
+IProgrammeEditionRepositorySpringData "1" --|> "1" JpaRepository : extends
+
+'CourseEdition
+CourseEditionRepositorySpringData "*" ..|> "1" ICourseEditionRepository : implements
+CourseEditionRepositorySpringData "*" ..> "1" ICourseEditionRepositorySpringData : uses
+ICourseEditionRepositorySpringData "1" --|> "1" JpaRepository : extends
+
+'Services Uses Repository
+IDegreeTypeService "1" ..> "1" IDegreeTypeRepository : uses
+IProgrammeService "1" ..> "1" IProgrammeRepository : uses
+IStudyPlanService "1" ..> "1" IStudyPlanRepository : uses
+ICourseInStudyPlanService "1" ..> "1" ICourseInStudyPlanRepository : uses
+IProgrammeEditionService "1" ..> "1" IProgrammeEditionRepository : uses
+ICourseEditionService "1" ..> "1" ICourseEditionRepository : uses
+
+'Services Uses Factories
+IDegreeTypeService ..> IDegreeTypeFactory : uses
+DegreeTypeImpl ..|> IDegreeTypeFactory : implements
+IProgrammeService ..> IProgrammeFactory : uses
+ProgrammeImpl ..|> IProgrammeFactory : implements
+IStudyPlanService ..> IStudyPlanFactory : uses
+StudyPlanImpl ..|> IStudyPlanFactory : implements
+ICourseInStudyPlanService ..> ICourseInStudyPlanFactory : uses
+CourseInStudyPlanImpl ..|> ICourseInStudyPlanFactory : implements
+IProgrammeEditionService ..> IProgrammeEditionFactory : uses
+ProgrammeEditionImpl ..|> IProgrammeEditionFactory : implements
+ICourseEditionService ..> ICourseEditionFactory : uses
+CourseEditionImpl ..|> ICourseEditionFactory : implements
+
+'Repositories and Aggregates
+IDegreeTypeRepository "1" --> "*" "<<Root>>\n<<Entity>>\nDegreeType" : contains
+IProgrammeRepository "1" --> "*" "<<Root>>\n<<Entity>>\nProgramme" : contains
+IStudyPlanRepository "1" --> "*" "<<Root>>\n<<Entity>>\nStudyPlan" : contains
+ICourseInStudyPlanRepository "1" --> "*" "<<Root>>\n<<Entity>>\nCourseInStudyPlan" : contains
+IProgrammeEditionRepository "1" --> "*" "<<Root>>\n<<Entity>>\nProgrammeEdition" : contains
+ICourseEditionRepository "1" --> "*" "<<Root>>\n<<Entity>>\nCourseEdition" : contains
+
+'Mappers & DataModels
+DegreeTypeMapper ..|> IDegreeTypeMapper : implements
+IDegreeTypeMapper ..> DegreeDataModel : creates
+ProgrammeMapper ..|> IProgrammeMapper : implements
+IProgrammeMapper ..> ProgrammeDataModel : creates
+StudyPlanMapper ..|> IStudyPlanMapper : implements
+IStudyPlanMapper ..> StudyPlanDataModel : creates
+CourseInStudyPlanMapper ..|> ICourseInStudyPlanMapper : implements
+ICourseInStudyPlanMapper ..> CourseInStudyPlanDataModel : creates
+ProgrammeEditionMapper ..|> IProgrammeEditionMapper : implements
+IProgrammeEditionMapper ..> ProgrammeEditionDataModel : creates
+CourseEditionMapper ..|> ICourseEditionMapper : implements
+ICourseEditionMapper ..> CourseEditionDataModel : creates
+
+'Repository & Mapper
+IDegreeTypeRepository ..> IDegreeTypeMapper : uses
+IProgrammeRepository ..> IProgrammeMapper : uses
+IStudyPlanRepository ..> IStudyPlanMapper : uses
+ICourseInStudyPlanRepository ..> ICourseInStudyPlanMapper : uses
+IProgrammeEditionRepository ..> IProgrammeEditionMapper : uses
+ICourseEditionRepository ..> ICourseEditionMapper : uses
+
+'Aggregates & ValueObjects
+"<<Root>>\n<<Entity>>\nDegreeType" *-- DegreeTypeID : contains
+"<<Root>>\n<<Entity>>\nProgramme" *-- ProgrammeID : contains
+"<<Root>>\n<<Entity>>\nStudyPlan" *-- StudyPlanID : contains
+"<<Root>>\n<<Entity>>\nCourseInStudyPlan" *-- CourseInStudyPlanID : contains
+"<<Root>>\n<<Entity>>\nProgrammeEdition" *-- ProgrammeEditionID : contains
+"<<Root>>\n<<Entity>>\nCourseEdition" *-- CourseEditionID : contains
+"<<Root>>\n<<Entity>>\nCourseEdition" <..  ProgrammeEditionID : uses
+"<<Root>>\n<<Entity>>\nCourseEdition" <..  CourseInStudyPlanID : uses
+
+
+@enduml

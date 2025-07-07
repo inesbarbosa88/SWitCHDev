@@ -1,0 +1,258 @@
+@startuml
+top to bottom direction
+title US13 - As a HRC, I want to register a new teacher in the system, including all Relevant Data, Class Diagram
+skinparam ranksep 180
+skinparam nodesep 180
+
+'--- Classes and interfaces ---
+
+class US13_RegisterTeacherAndRelevantDataController {
+    +US13_RegisterTeacherAndRelevantDataController(ITeacherCategoryRepository teacherCategoryRepository, IDepartmentRepository departmentRepository,
+        ITeacherRepository teacherRepository, ITeacherCareerProgressionRepository teacherCareerProgressionRepository)
+    +getTeacherCategoryList()
+    +getDepartmentList()
+    +registerTeacher(teacherAcronym: String, name: String, email: String, nif: String, phoneNumber: String, academicBackground: String,
+        street: Street, postalCode: String, location: String, country: String, date: String, teacherCategoryId: String,
+         workingPercentage: int, departmentAcronym: String, countryCode: String)
+}
+
+interface ITeacherCategoryRepository {
+    +findAll(): List<TeacherCategory>
+}
+
+class TeacherCategoryRepositoryImpl {
+    +findAll(): List<TeacherCategory>
+}
+
+interface IDepartmentRepository {
+    +findAll(): Set<Department>
+}
+
+class DepartmentRepositoryImpl {
+    +findAll(): Set<Department>
+}
+
+interface ITeacherRepository {
+    +registerTeacher(teacherAcronym: TeacherAcronym, name: Name, email: Email, nif: NIF, phoneNumber: PhoneNumber, academicBackground: AcademicBackground,
+        street: Street, postalCode: PostalCode, location: Location, country: Country, departmentId: DepartmentID)
+}
+
+class TeacherRepositoryImpl {
+    +registerTeacher(teacherAcronym: TeacherAcronym, name: Name, email: Email, nif: NIF, phoneNumber: PhoneNumber, academicBackground: AcademicBackground,
+        street: Street, postalCode: PostalCode, location: Location, country: Country, departmentId: DepartmentID)
+}
+
+interface ITeacherFactory {
+    +createTeacher(teacherAcronym: TeacherAcronym, name: Name, email: Email, nif: NIF, phoneNumber: PhoneNumber, academicBackground: AcademicBackground,
+        street: Street, postalCode: PostalCode, location: Location, country: Country, departmentId: DepartmentID): Teacher
+}
+
+class TeacherFactoryImpl {
+    +createTeacher(teacherAcronym: TeacherAcronym, name: Name, email: Email, nif: NIF, phoneNumber: PhoneNumber, academicBackground: AcademicBackground,
+        street: Street, postalCode: PostalCode, location: Location, country: Country, departmentId: DepartmentID): Teacher
+}
+
+interface ITeacherListFactory {
+    +newList(): List<Teacher>
+}
+
+class TeacherListFactoryImpl {
+    +newList(): List<Teacher>
+}
+
+interface List_TeacherCareerProgression <TeacherCareerProgression> {
+}
+
+interface List_Teacher <Teacher> {
+}
+
+interface IRepo {
+    +save(T entity): T
+    +findAll(): Iterable<T>
+    +ofIdentity(ID id): Optional<T>
+    +containsOfIdentity(ID id): boolean
+}
+
+package Teacher_Aggregate {
+    class Teacher <<root>> {
+        -_teacherId: TeacherID
+        -_name: Name
+        -_email: Email
+        -_nif: NIF
+        -_phoneNumber: PhoneNumber
+        -_academicBackground: AcademicBackground
+        -_address: Address
+        _department: DepartmentID
+        +Teacher(teacherAcronym: TeacherAcronym, name: Name, email: Email, nif: NIF, phoneNumber: PhoneNumber, academicBackground: AcademicBackground,
+            address: Address, departmentId: DepartmentID)
+     }
+ }
+
+interface ITeacherCareerProgressionRepository {
+    +registerTeacherCareerProgression(date: Date, teacherCategoryId: TeacherCategoryID, workingPercentage: WorkingPercentage, teacherId: TeacherID)
+}
+
+class TeacherCareerProgressionRepositoryImpl {
+    +registerTeacherCareerProgression(date: Date, teacherCategoryId: TeacherCategoryID, workingPercentage: WorkingPercentage, teacherId: TeacherID)
+}
+
+interface ITeacherCareerProgressionFactory {
+    +createTeacherCareerProgression(date: Date, teacherCategoryId: TeacherCategoryID, workingPercentage: WorkingPercentage, teacherId: TeacherID)
+}
+
+class TeacherCareerProgressionFactoryImpl {
+    +createTeacherCareerProgression(date: Date, teacherCategoryId: TeacherCategoryID, workingPercentage: WorkingPercentage, teacherId: TeacherID)
+}
+
+package TeacherCareerProgression_Aggregate {
+    class TeacherCareerProgression <<root>> {
+        -_tcpID: TeacherCareerProgressionID
+        -_date: Date
+        -_teacherCategoryID TeacherCategoryID
+        -_workingPercentage: WorkingPercentage
+        -_teacherID TeacherID
+        +TeacherCareerProgression(date: Date, teacherCategoryId: TeacherCategoryID, workingPercentage: WorkingPercentage, teacherId: TeacherID)
+    }
+}
+
+interface ITeacherCareerProgressionListFactory {
+    +newArrayList(): List<TeacherCareerProgression>
+}
+
+class TeacherCareerProgressionListFactory {
+    +newArrayList(): List<TeacherCareerProgression>
+}
+
+package TeacherCategory_Aggregate {
+    class TeacherCategory <<root>> {
+    -_teacherCategoryId = TeacherCategoryID
+    -_name: Name
+    }
+}
+
+package Department_Aggregate {
+    class Department <<root>> {
+    -_departmentId: DepartmentID
+    -_name: Name
+    -_director: TeacherID
+    }
+}
+
+'--- VOs ---
+
+class TeacherID <<VO>> {
+    -_teacherAcronym: TeacherAcronym
+}
+
+class Name <<VO>> {
+}
+
+class Email <<VO>> {
+}
+
+class NIF <<VO>> {
+}
+
+class PhoneNumber <<VO>> {
+}
+
+class Street <<VO>> {
+}
+
+class PostalCode <<VO>> {
+}
+
+class Location <<VO>> {
+}
+
+class Country <<VO>> {
+}
+
+class AcademicBackground <<VO>> {
+}
+
+class WorkingPercentage <<VO>> {
+    -_workingPercentage: String
+}
+
+class Date <<VO>> {
+    -_localDate: LocalDate
+}
+
+class DepartmentID <<VO>> {
+    -_departmentAcronym: DepartmentAcronym
+}
+
+class TeacherCategoryID <<VO>> {
+    -_id: UUID
+}
+
+class Address <<VO>> {
+-_street: Street
+ -_postalCode: PostalCode
+ -_location: Location
+ -_country: Country
+ +Address(street: Street, postalCode: PostalCode, location: Location, country: Country)
+}
+
+'--- Relations ---
+
+US13_RegisterTeacherAndRelevantDataController "\n1" -u-> "_teacherCategoryRepository \n1" ITeacherCategoryRepository
+TeacherCategoryRepositoryImpl "1 " ..|> "1  " ITeacherCategoryRepository
+ITeacherCategoryRepository "1\t\t" --> "_tcList\n*" TeacherCategory
+
+US13_RegisterTeacherAndRelevantDataController "1 " -u-> "_departmentRepository \n1" IDepartmentRepository
+DepartmentRepositoryImpl "1" .r.|> " 1" IDepartmentRepository
+IDepartmentRepository " 1" -u-> "_dptSet\n*" Department
+
+US13_RegisterTeacherAndRelevantDataController "1" --> "_teacherRepository \n1" ITeacherRepository
+TeacherRepositoryImpl "1" ..|> "1         " ITeacherRepository
+ITeacherRepository "1 " ..> "1 " ITeacherListFactory
+ITeacherRepository "1" --> "1" List_Teacher
+TeacherListFactoryImpl "1 " .l.|> "1 " ITeacherListFactory
+ITeacherListFactory "1 " ..> "1" List_Teacher: <<create>>
+List_Teacher "1 " --> "*" Teacher
+ITeacherRepository "1" -r-|> "1" IRepo
+
+ITeacherRepository "1" ..> "1" ITeacherFactory
+TeacherFactoryImpl "1  " ..|> "1  " ITeacherFactory
+ITeacherFactory "1" .u.> "1" Address: <<create>>
+ITeacherFactory "1  " ..> "1  " Teacher: <<create>>
+
+Teacher "1" --> "1" Address
+
+US13_RegisterTeacherAndRelevantDataController "\n1" -u-> "_TeacherCareerProgressionRepository \n1" ITeacherCareerProgressionRepository
+TeacherCareerProgressionRepositoryImpl "1 " ..|> "1  " ITeacherCareerProgressionRepository
+ITeacherCareerProgressionRepository "1" ..> "1" ITeacherCareerProgressionFactory
+TeacherCareerProgressionFactoryImpl "1  " ..|> "1  " ITeacherCareerProgressionFactory
+ITeacherCareerProgressionFactory "1   " ..> "1 " TeacherCareerProgression: <<create>>
+ITeacherCareerProgressionRepository "1" ..> "1" ITeacherCareerProgressionListFactory
+TeacherCareerProgressionListFactory "1" ..|> "1" ITeacherCareerProgressionListFactory
+ITeacherCareerProgressionListFactory "1" ..> "1" List_TeacherCareerProgression: <<create>>
+List_TeacherCareerProgression "1" --> "1..*\t\t" TeacherCareerProgression
+ITeacherCareerProgressionRepository "1" --> "1" List_TeacherCareerProgression
+ITeacherCareerProgressionRepository "1" --|> "1" IRepo
+
+'--- DTO Connections ---
+
+Teacher "1" ..> "1" TeacherAcronym
+Teacher "1" --> "1" TeacherID
+Teacher "1" --> "1" Name
+Teacher "1" --> "1" Email
+Teacher "1" --> "1" NIF
+Teacher "1" --> "1" PhoneNumber
+Teacher "1" --> "1" AcademicBackground
+Teacher "1" --> "1" DepartmentID
+
+TeacherID "1" --> "1" TeacherAcronym
+
+Address "1" --> "1" Street
+Address "1" --> "1" PostalCode
+Address "1" --> "1" Location
+Address "1" --> "1" Country
+
+TeacherCareerProgression "1" --> "1" Date
+TeacherCareerProgression "1" --> "1" TeacherCategoryID
+TeacherCareerProgression "1" --> "1" TeacherID
+TeacherCareerProgression "1" --> "1" WorkingPercentage
+@enduml

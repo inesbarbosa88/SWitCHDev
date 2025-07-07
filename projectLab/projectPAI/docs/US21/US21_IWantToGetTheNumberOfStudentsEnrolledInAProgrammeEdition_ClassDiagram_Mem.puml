@@ -1,0 +1,103 @@
+@startuml DomainModel_US21_Full_Cleaned
+
+title Domain Model - US21: Get the Number of Students Enrolled in a Programme Edition
+
+
+  ' === CONTROLLER ===
+  class US21_IWantToGetTheNumberOfStudentsEnrolledInAProgrammeEditionController {
+      - _programmeEditionEnrollmentRepo: IProgrammeEditionEnrolmentRepository
+      + US21_IWantToGetTheNumberOfStudentsEnrolledInAProgrammeEditionController(programmeEditionEnrollmentRepo: IProgrammeEditionEnrolmentRepository)
+      + iWantToGetTheNumberOfStudentsEnrolledInAProgrammeEdition(programmeEdition: ProgrammeEditionID): int
+      + getAllProgrammeEditions(): List<ProgrammeEdition>
+  }
+
+  ' === VALUE OBJECTS ===
+  class ProgrammeEditionID <<Value Object>> {
+      - _id: long
+      + ProgrammeEditionID(id: long)
+      + getId(): long
+      + equals(object: Object): boolean
+      + hashcode(): int
+      + toString(): String
+  }
+
+  class StudentID <<Value Object>> {
+      - _uniqueNumber: int
+      + StudentID(uniqueNumber: int)
+      + isUniqueNumberValid(): boolean
+  }
+
+  class ProgrammeEditionEnrolmentID <<Value Object>> {
+      - _id: long
+      + ProgrammeEditionEnrolmentID(id: long)
+      + getId(): long
+      + equals(object: Object): boolean
+      + hashcode(): int
+      + toString(): String
+  }
+
+  ' === AGGREGATE ===
+  package "ProgrammeEditionEnrolment Aggregate" #LightBlue {
+    class ProgrammeEditionEnrolment <<Root>> <<Entity>> {
+        + ProgrammeEditionEnrolment(studentId: StudentID, programmeEditionId: ProgrammeEditionID)
+        + getStudentUniqueNumber(): String
+        + equals(obj: Object): boolean
+        + findProgrammeEditionInEnrollment(): ProgrammeEditionID
+    }
+  }
+
+  ' === REPOSITORIES ===
+  interface IProgrammeEditionEnrolmentRepository {
+      + enrolStudentInProgrammeEdition(studentId: StudentID, programmeEditionId: ProgrammeEditionID): boolean
+      + isStudentEnrolledInThisProgrammeEdition(studentId: StudentID, programmeEditionId: ProgrammeEditionID): boolean
+      + iWantToGetTheNumberOfStudentsEnrolledInAProgrammeEdition(programmeEditionID: ProgrammeEditionID): int
+  }
+
+  class ProgrammeEditionEnrolmentRepository {
+      + ProgrammeEditionEnrolmentRepository(programmeEditionEnrolmentFactory: ProgrammeEditionEnrolmentFactory, programmeEditionEnrolmentListFactory: ProgrammeEditionEnrolmentListFactory)
+      + enrolStudentInProgrammeEdition(studentId: StudentID, programmeEditionId: ProgrammeEditionID): boolean
+      + isStudentEnrolledInThisProgrammeEdition(studentId: StudentID, programmeEditionId: ProgrammeEditionID): boolean
+      + iWantToGetTheNumberOfStudentsEnrolledInAProgrammeEdition(programmeEditionID: ProgrammeEditionID): int
+  }
+
+  IProgrammeEditionEnrolmentRepository <|.. ProgrammeEditionEnrolmentRepository
+
+  ' === FACTORIES ===
+  interface ProgrammeEditionEnrolmentFactory {
+      + newProgrammeEditionEnrolment(studentId: StudentID, programmeEditionId: ProgrammeEditionID): ProgrammeEditionEnrolment
+  }
+
+  interface ProgrammeEditionEnrolmentListFactory {
+      + newProgrammeEditionEnrolmentList(): Set<ProgrammeEditionEnrolmentID>
+  }
+
+  ' === COLLECTION SUPPORT ===
+  class ProgrammeEditionEnrolmentArrayList {
+      + add(programmeEditionEnrolment: ProgrammeEditionEnrolment): boolean
+  }
+
+  interface IProgrammeEditionEnrolmentService {
+  }
+
+  class ProgrammeEditionEnrolmentServiceImpl {
+  }
+  ' === RELATIONSHIPS ===
+  ProgrammeEditionEnrolment --> ProgrammeEditionID: contains
+  ProgrammeEditionEnrolment --> StudentID: contains
+  ProgrammeEditionEnrolment --> ProgrammeEditionEnrolmentID: contains
+
+  ProgrammeEditionEnrolmentRepository --> ProgrammeEditionEnrolment: uses
+  ProgrammeEditionEnrolmentRepository --> ProgrammeEditionEnrolmentArrayList: stores
+  ProgrammeEditionEnrolmentArrayList --> ProgrammeEditionEnrolment: contains
+
+  US21_IWantToGetTheNumberOfStudentsEnrolledInAProgrammeEditionController ..> IProgrammeEditionEnrolmentService
+  ProgrammeEditionEnrolmentServiceImpl -right..|> IProgrammeEditionEnrolmentService: implements
+  IProgrammeEditionEnrolmentService -down-> IProgrammeEditionEnrolmentRepository: uses
+  ProgrammeEditionEnrolmentRepository --> ProgrammeEditionEnrolmentFactory : uses
+  ProgrammeEditionEnrolmentRepository --> ProgrammeEditionEnrolmentListFactory : uses
+
+  ProgrammeEditionEnrolmentFactory --> ProgrammeEditionEnrolment : creates
+  ProgrammeEditionEnrolmentListFactory --> ProgrammeEditionEnrolmentArrayList : creates
+}
+
+@enduml

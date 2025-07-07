@@ -1,0 +1,123 @@
+@startuml
+actor ASC
+participant UI
+participant ":AddCourseToAProgramme\nController" as CTRL
+participant ":ServiceProgramme" as SP
+participant ":ProgrammeRepository" as PR
+participant ":ServiceStudyPlan" as SSP
+participant ":StudyPlanRepository" as SPR
+participant ":ServiceCourse" as SC
+participant ":CourseRepository" as CR
+participant ":ServiceCourseInStudyPlan" as SCSP
+participant ":Course InStudyPlanRepository" as CSPR
+participant ":FactoryCourseInStudyPlan" as FCSP
+skinparam sequenceLifeLineBackgroundColor #application
+autonumber
+
+ASC -> UI ++  : I want to add Course to a Programme
+UI -> CTRL ++ : getAllProgrammes()
+CTRL -> SP ++ : findAll()
+SP -> PR ++ : findAll()
+ref over PR
+REF1
+FindAll()
+ProgrammeDataModel
+end ref
+PR --> SP -- : programmeListDomain
+SP --> CTRL -- : programmeListDomain
+|||
+ref over CTRL
+\t\t\t\tConvert programmeListDomain to programmeListDTO
+
+end ref
+|||
+CTRL --> UI --:  programmeListDTO
+
+UI --> ASC --: Which Programme?
+ASC -> UI ++: This Programme1!
+
+UI -> CTRL ++ : getAllCourses()
+
+CTRL -> SC ++ : findAll()
+SC -> CR ++ : findAll()
+ref over CR
+REF2
+FindAll()
+CourseDataModel
+end ref
+CR --> SC -- : courseListDomain
+SC --> CTRL  -- : courseListDomain
+|||
+ref over CTRL
+\t\t\t\tConvert courseListDomain to courseListDTO
+
+end ref
+|||
+CTRL --> UI  -- : courseListDTO
+
+UI --> ASC -- : Which Course?
+ASC -> UI ++: course1!
+UI --> ASC --: Which Curricular Year?
+ASC -> UI ++: 2nd!
+UI --> ASC --: Which Semester?
+ASC -> UI ++: 1st!
+UI --> ASC --: Duration of course in Semester?
+ASC -> UI ++: 1!
+UI --> ASC --: Quantity of credits?
+ASC -> UI ++: 4 ECTS credits!
+
+UI -> CTRL ++: addCourseToProgramme\n(c1_DTO, p1_DTO, duration, credits, curricularYear, semester)
+|||
+ref over CTRL
+\t\tConvert SemestreDTO to SemestreVO
+\t\t\t\tConvert CurricularYearDTO to CurricularYearVO
+\t\t\tConvert Course_DTO to CourseID_VO
+\tConvert p1_DTO to p1ID_VO
+\t\t\tConvert DurationDTO to DurationVO
+\t\t\tConvert CreditsDTO to CreditsVO
+
+end ref
+|||
+CTRL -> SSP ++: getLatestStudyPlanIDByProgrammeID(p1_ID)
+SSP -> SPR ++: getLatestStudyPlanIDByProgrammeID(p1_ID)
+ref over SPR
+\t\t\t REF3
+\t\t\t findLast(p1_ID)
+\t\t\t\tStudyPlanDataModel
+end ref
+SPR -> SSP --: sP1_ID
+SSP -> CTRL --: sP1_ID
+CTRL-> SCSP ++  : createCourseInStudyPlan\n(Semester, CurricularYear, c1_ID, sp_1ID, Duration, Credits)
+SCSP -> FCSP ++  : newCourseInStudyPlan\n(Semester, CurricularYear, c1_ID, sp_1ID, Duration, Credits)
+
+create "cisp1:CourseInStudyPlan" as CISP #lightblue
+FCSP --> CISP : <create> (Semester, CurricularYear, c1_ID, sp_1ID, Duration, Credits)
+FCSP --> SCSP --:
+SCSP --> CSPR ++ : save(cisp1)
+ref over CSPR
+\t\t\tREF4
+\t\t\tsave(cisp1)
+\t\t\t\tCourseInStudyPlanDataModel
+
+end ref
+CSPR --> SCSP -- : save.cisp1
+
+SCSP --> CTRL--: save.cisp1
+CTRL --> UI -- : save.cisp1
+UI --> ASC -- : Success
+
+
+participant "programmeListDomain: List<Programme>"
+participant "programmeListDTO: List<ProgrammeDTO>"
+participant "p1DTO:ProgrammeDTO"
+participant "p1_ID:ProgrammeID"
+participant "courseListDomain: List<Course>"
+participant "courseListDTO: List<CourseDTO>"
+participant "courseDTO:CourseDTO"
+participant "c1_ID:CourseID"
+participant "sP1_ID:StudyPlanID"
+
+
+
+
+@enduml

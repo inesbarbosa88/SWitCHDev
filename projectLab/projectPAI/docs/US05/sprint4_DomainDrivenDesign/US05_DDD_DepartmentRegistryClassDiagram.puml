@@ -1,0 +1,87 @@
+@startuml
+title US05: Register a Department in the System
+'left to right direction'
+
+class US05_RegisterADepartmentController {
+    +US05_RegisterADepartmentController(departmentRepo: IDepartmentRepository)
+    +registerDepartment(acronym: DepartmentAcronym, name: Name): boolean
+}
+
+interface IDepartmentRepository {
+    + registerDepartment(acronym: DepartmentAcronym, name: Name): boolean
+}
+class DepartmentRepository {
+    +DepartmentRepository(departmentFactoryInterface: DepartmentFactory, departmentListFactoryInterface: DepartmentListFactory )
+    +registerDepartment(acronym: DepartmentAcronym, name: Name) :boolean
+}
+
+class DepartmentFactoryImpl {
+    +newDepartment(acronym: DepartmentAcronym, name: Name): Department
+}
+
+interface IDepartmentFactory {
+    +newDepartment(acronym: DepartmentAcronym, name: Name): Department
+}
+
+class DepartmentListFactoryImpl {
+    +newDepartmentList: HashSet<Department>
+}
+
+interface IDepartmentListFactory {
+    + newDepartmentList(): HashSet<Department>
+}
+
+interface Set {
+    +add(): boolean
+}
+
+package "Department Aggregate" {
+
+class Department <<root>> {
+    +Department(acronym: DepartmentAcronym , name: Name)
+    +hashCode(): int
+    +identity(): DepartmentAcronym
+    +equals(obj: Object): boolean
+    +sameAs(obj: Object): boolean
+    +getName(): Name
+    +getAcronym(): DepartmentAcronym
+}
+}
+
+class Name <<Value Object >> {
+    -_name: String
+    + Name(name: String)
+    + getName(): String
+}
+
+class DepartmentAcronym <<Value Object>> {
+    -_acronym: String
+    + DepartmentAcronym(acronym: String)
+    + getAcronym(): String
+    + equals(obj: Object): boolean
+    + hashCode(): int
+}
+
+class DepartmentID <<Value Object>> {
+    + DepartmentID(acronym: DepartmentAcronym)
+    + getAcronym(): DepartmentAcronym
+    + equals(obj: Object): boolean
+    + hashCode(): int
+}
+
+DepartmentRepository "1" ..> "*" Department
+DepartmentRepository "1" -> "1" Set
+Department "1" <- "1" Set
+DepartmentRepository "1" ..> "_departmentsList 1" IDepartmentListFactory
+IDepartmentListFactory  <|..  DepartmentListFactoryImpl
+IDepartmentFactory  <|..  DepartmentFactoryImpl
+IDepartmentListFactory  ..>  Set
+US05_RegisterADepartmentController "1  " ..> "            1\n_departmentRepo    " IDepartmentRepository
+IDepartmentRepository <|.. DepartmentRepository
+Department "1" <.. "1" IDepartmentFactory
+IDepartmentFactory "_departmentFactory1" <.. "1"  DepartmentRepository
+Name "_departmentName 1" <-- "1" Department
+Department "1" --> "1 _departmentId" DepartmentID
+DepartmentID "1" --> "1 _departmentAcronym" DepartmentAcronym
+Department "1" ..> "1" DepartmentAcronym
+@enduml

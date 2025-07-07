@@ -1,0 +1,92 @@
+@startuml
+
+
+package "AccessMethod Aggregate" {
+    entity "<<Root>>\n <<Entity>>\n AccessMethod" as AME{
+    + AccessMethod(accessMethodId: AccessMethodId, accessMethodName: NameWithNumbersAndSpecialChars)
+    + Equals(Object objectToCompare)
+    }
+    class "<<Value Object>>\n NameWithNumbersAndSpecialChars" as VOName{
+        - accessMethodName: String
+        + Equals(Object objectToCompare)
+    }
+
+    class "<<Value Object>>\n AccessMethodId" as VOId{
+        - id: String
+        + Equals(Object objectToCompare)
+    }
+}
+
+'uses
+AME "1" --> "uses 1" VOName
+AME "1" --> "uses 1" VOId
+
+interface IRepository {
+}
+
+class AccessMethodSpringDataImpl {
+}
+
+interface IAccessMethodFactory {
+    createAccessMethod(accessMethodID: AccessMethodID, accessMethodName: NameWithNumbersAndSpecialChars)
+}
+
+class AccessMethodFactoryImpl {
+     +createAccessMethod(accessMethodID: AccessMethodID, accessMethodName: NameWithNumbersAndSpecialChars)
+}
+
+interface IAccessMethodService {
+  registerAccessMethod(accessMethodName: NameWithNumbersAndSpecialChars)
+}
+
+class AccessMethodServiceImpl {
+    + registerAccessMethod(accessMethodName: NameWithNumbersAndSpecialChars)
+}
+
+interface JpaRepository<AccessMethodDataModel, AccessMethodDataModelID>{
+}
+
+class AccessMethodDataModel {
+}
+
+
+interface IAccessMethodRepository {
+}
+
+interface IAccessMethodMapper{
+    + toDomain()
+    + toDataModel()
+}
+
+class AccessMethodMapperImpl {
+}
+
+interface IAccessMethodRepositorySpringData{
+}
+
+
+class US02_ConfigureAccessMethod_Controller {
+    +US02_ConfigureAccessMethod_Controller(accessMethodService: IAccessMethodService)
+    +createAccessMethod(accessMethodName: String)
+}
+
+class NameWithNumbersAndSpecialChars {
+}
+
+US02_ConfigureAccessMethod_Controller "1"->"1..*"NameWithNumbersAndSpecialChars: uses
+IAccessMethodRepositorySpringData "1"-down->"1..*" IAccessMethodMapper: uses
+AccessMethodMapperImpl "1"-right..|>"1" IAccessMethodMapper: implements
+AccessMethodSpringDataImpl "1"-down->"1..*" IAccessMethodRepositorySpringData: uses
+IAccessMethodRepositorySpringData "1"-up-|>"1" JpaRepository : extends
+AccessMethodSpringDataImpl "1"..|>"1" IAccessMethodRepository: implements
+IAccessMethodRepository "1"-up..|>"1" IRepository: implements
+IAccessMethodFactory "1" ..> "1..*" AME : creates
+US02_ConfigureAccessMethod_Controller "1"-down->"1..*" IAccessMethodService: uses
+AccessMethodServiceImpl "1".left.|>"1" IAccessMethodService: implements
+AccessMethodFactoryImpl "1".right.|>"1" IAccessMethodFactory: implements
+IAccessMethodService "1"-down->"1..*" IAccessMethodFactory: uses
+IAccessMethodRepository "1"-down->"1..*" AccessMethodDataModel: persist
+IAccessMethodMapper "1"..>"1..*" "AccessMethod Aggregate": transforms to/from
+IAccessMethodMapper "1"..>"1..*" AccessMethodDataModel: transforms to/from
+IAccessMethodService "1"..>"1..*" IAccessMethodRepository: uses
+@enduml

@@ -1,0 +1,108 @@
+@startuml
+
+title US20_DefineRucForACourseEditionClassDiagram.puml
+
+class US20_DefineRucForCourseEditionController {
+    -_courseEditionRepository: CourseEditionRepository
+    -_teacherRepository: TeacherRepository
+    +US20_DefineRucForCourseEditionController(courseEditionRepository: CourseEditionRepository, teacherRepository: TeacherRepository)
+    +getCourseEdition()
+    +getTeachers()
+    +defineRucForCourseEdition(courseEdition: CourseEdition, teacher: Teacher)
+}
+
+note right of US20_DefineRucForCourseEditionController::defineRucForCourseEdition
+  This method assigns a RUC teacher to a Course Edition.
+end note
+
+class Teacher {
+    -_acronym: String
+    -_name: String
+    -_email: String
+    -_nif: String
+    -_phoneNumber: String
+    -_academicBackground: String
+    -_address: Address
+    -_addressFactory: IAddressFactory
+    -_department: Department
+    -_teacherCareerProgressionList: List<TeacherCareerProgression>
+    -_teacherCareerProgressionFactory: ITeacherCareerProgressionFactory
+    +Teacher(acronym: String, name: String, email: String, nif: String, phoneNumber: String, academicBackground: String,
+             street: String, postalCode: String, location: String, country: String, addressFactory: IAddressFactory,
+             date: Date, category: TeacherCategoryID, workingPercentage: WorkingPercentage, teacherID: TeacherID,
+             department: Department, teacherCareerProgressionFactory: ITeacherCareerProgressionFactory,
+             teacherCareerProgressionListFactory: ITeacherCareerProgressionListFactory)
+    +hasSameAcronym(teacher: Teacher): boolean
+    +hasSameNif(teacher: Teacher): boolean
+    +isInDepartment(department: Department): boolean
+    +hasThisNIF(NIF: String): boolean
+}
+
+class TeacherRepository {
+    -_teachers: List<Teacher>
+    -_teacherFactory: ITeacherFactory
+    +TeacherRepository(teacherFactory: ITeacherFactory, teacherListFactoryImpl: TeacherListFactoryImpl)
+    +registerTeacher(acronym: String, name: String, email: String, nif: String, phoneNumber: String, academicBackground: String,
+                     street: String, postalCode: String, location: String, country: String, addressFactory: IAddressFactory,
+                     date: Date, category: TeacherCategoryID, workingPercentage: WorkingPercentage, teacherID: TeacherID,
+                     department: Department): boolean
+    +getAllTeachers(): List<Teacher>
+    +getTeacherByNIF(NIF: String): Optional<Teacher>
+}
+
+note right of TeacherRepository::getAllTeachers
+  This method returns all teachers in the repository.
+end note
+
+class CourseEdition {
+    -_course: Course
+    -_programmeEdition: ProgrammeEdition
+    -_ruc: Teacher
+    +CourseEdition(course: Course, programmeEdition: ProgrammeEdition)
+    +equals(objectToCompare: Object): boolean
+    +setRuc(ruc: Teacher): boolean
+    +whatProgrammeEditionBelongsThisCourseEdition(): ProgrammeEdition
+    +getCourse(): Course
+}
+
+
+note left of CourseEdition::setRuc
+  This method assigns a teacher RUC to a Course Edition.
+end note
+
+class CourseEditionRepository {
+    -_courseEditions: List<CourseEdition>
+    -_I_courseEditionFactory: ICourseEditionFactory
+    +CourseEditionRepository(ICourseEditionFactory ICourseEditionFactory, ICourseEditionListFactory ICourseEditionListFactory)
+    +createAndSaveCourseEdition(course: Course, programmeEdition: ProgrammeEdition): boolean
+    +isCourseEditionAlreadyInRepository(courseEdition: CourseEdition): boolean
+    +getCourseEditions(): List<CourseEdition>
+    +setRucInACourseEdition(courseEdition: CourseEdition, ruc: Teacher): boolean
+    +findWhichProgrammeEditionBelongsToACourseEdition(courseEdition: CourseEdition): ProgrammeEdition
+    +findCourseEditionsByProgrammeEdition(programmeEdition: ProgrammeEdition): List<CourseEdition>
+}
+
+note left of CourseEditionRepository::setRucInACourseEdition
+  This method returns all course editions in the repository.
+end note
+
+note left of CourseEditionRepository::getCourseEditions
+  This method returns set the Ruc in a course editions, in the repository.
+end note
+
+
+
+
+US20_DefineRucForCourseEditionController "  1  " ..> "  1  " CourseEditionRepository : uses
+
+US20_DefineRucForCourseEditionController "  1  " ..> "  1  " TeacherRepository: uses
+
+CourseEditionRepository " List<CourseEditions> 1  " --> "  1..*  " CourseEdition
+
+TeacherRepository "List<Teachers>  1  " --> "  1..*  " Teacher
+
+CourseEdition "  0..1  " --> "  1  " Teacher
+
+
+
+@enduml

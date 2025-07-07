@@ -1,0 +1,432 @@
+@startuml
+top to bottom direction
+title US13 - Teacher Registration Class Diagram
+skinparam ranksep 150
+skinparam nodesep 100
+
+
+interface IRepository {
+    save(entity : Entity);
+    findAll();
+    ofIdentity(ID id);
+    containsOfIdentity(ID id);
+}
+
+'=== 1. CONTROLLER ==='
+class US13_RegisterTeacherAndRelevantDataController {
+  +getTeacherCategoryList()
+  +getDepartmentList()
+  +registerTeacher(...)
+}
+
+'=== 2. SERVICES ==='
+class TeacherCategoryServiceImpl {
+  +findAll(): List<TeacherCategory>
+}
+
+interface ITeacherCategoryService
+
+class DepartmentServiceImpl {
+  +findAll(): Set<Department>
+}
+
+interface IDepartmentService
+
+class TeacherServiceImpl {
+  +registerTeacher(...): boolean
+}
+
+interface ITeacherService
+
+'=== 3. REPOSITORY INTERFACES ==='
+interface ITeacherCategoryRepository {
+  +findAll(): List<TeacherCategory>
+}
+
+interface IDepartmentRepository {
+  +findAll(): Set<Department>
+}
+
+interface ITeacherRepository {
+  +registerTeacher(...): boolean
+  +containsOfIdentity(TeacherID): boolean
+  +existsByIDorNIF(...): boolean
+}
+
+interface ITeacherRepositorySpringData {
+}
+
+interface JpaRepository {
+}
+
+
+interface ITeacherCareerProgressionRepository {
+  +saveTeacherCareerProgression(TeacherCareerProgression)
+}
+
+'=== 4. REPOSITORY IMPLEMENTATIONS ==='
+class TeacherCategoryRepositoryImpl {
+  +findAll(): List<TeacherCategory>
+}
+
+class DepartmentRepositoryImpl {
+  +findAll(): Set<Department>
+}
+
+class TeacherRepositorySpringDataImpl {
+  +save(Teacher)
+  +containsOfIdentity(TeacherID)
+  +existsByIDorNIF(TeacherID, NIF)
+}
+
+class TeacherCareerProgressionRepositoryImpl {
+  +saveTeacherCareerProgression(TeacherCareerProgression)
+}
+
+'=== 5. FACTORIES ==='
+interface ITeacherCategoryFactory {
+  +createTeacherCategory(Name): TeacherCategory
+}
+
+class TeacherCategoryFactoryImpl {
+  +createTeacherCategory(Name): TeacherCategory
+}
+
+interface IDepartmentFactory {
+  +createDepartment(Name): Department
+}
+
+class DepartmentFactoryImpl {
+  +createDepartment(Name): Department
+}
+
+interface ITeacherFactory {
+  +createTeacher(...): Teacher
+}
+
+class TeacherFactoryImpl {
+  +createTeacher(...): Teacher
+}
+
+interface ITeacherCareerProgressionFactory {
+  +createTeacherCareerProgression(...): TeacherCareerProgression
+}
+
+class TeacherCareerProgressionFactoryImpl {
+  +createTeacherCareerProgression(...): TeacherCareerProgression
+}
+
+'=== 6. AGGREGATES ==='
+package "Teacher Aggregate" {
+  class Teacher <<Root>> {
+
+  }
+}
+
+package "TeacherCareerProgression Aggregate" {
+  class TeacherCareerProgression <<Root>> {
+  }
+}
+
+package "TeacherCategory Aggregate" {
+  class TeacherCategory <<Root>> {}
+}
+
+package "Department Aggregate" {
+  class Department <<Root>> {
+  }
+}
+
+class TeacherIDDataModel {
+    -_teacherIDDataModel : String
+    +getAcronym()
+}
+
+class NIFDataModel {
+    -_nif : String
+    -_country : String
+    +getNIF()
+    +getCountry()
+}
+
+class PhoneNumberDataModel {
+    -_countryCode : String
+    -_phoneNumber : String
+    +getCountry()
+    +getPhoneNumber()
+}
+
+class AddressDataModel {
+    -_street : String
+    -_postalCode : String
+    -_location : String
+    -_country : String
+    +getStreet()
+    +getPostalCode()
+    +getLocation()
+    +getCountry()
+}
+
+class TeacherAcademicEmailDataModel {
+    -_emailDomain : String
+    -_teacherAcademicEmail : String
+    +getEmailDomain()
+    +getTeacherAcademicEmail()
+}
+
+'=== 7. VALUE OBJECTS ==='
+class TeacherID <<VO>> {
+
+}
+
+class TeacherAcronym <<VO>> {
+ -_acronym : String
+}
+
+class DepartmentID <<VO>> {
+
+}
+
+class Acronym <<VO>> {
+ -_acronym : String
+}
+
+class Name <<VO>> {
+ -_name : String
+}
+
+class Email <<VO>> {
+ -_email : String
+}
+
+class NIF <<VO>> {
+ -_NIF : String
+}
+
+class PhoneNumber <<VO>> {
+ -_countryCode : String
+ -_phoneNumber : String
+}
+
+class Street <<VO>> {
+ -_street : String
+}
+
+class PostalCode <<VO>> {
+ -_postalCode : String
+}
+
+class Location <<VO>> {
+ -_location : String
+}
+
+class Country <<VO>> {
+ -_country : String
+}
+
+class AcademicBackground <<VO>> {
+ -_academicBackground : String
+}
+
+class WorkingPercentage <<VO>> {
+ -_workingPercentage : int
+}
+
+class Date <<VO>> {
+ -_date : LocalDate
+}
+
+class DepartmentID <<VO>> {
+
+}
+
+class TeacherCategoryID <<VO>> {
+
+}
+
+class Address <<VO>> {
+
+}
+
+'=== 8. MAPPERS ==='
+class TeacherCategoryMapperImpl {
+  +toDomain(teacherCategoryDataModel)
+}
+
+class DepartmentMapperImpl {
+  +toDomain(departmentDataModel)
+}
+
+class TeacherMapperImpl {
+  -_teacherFactory : ITeacherFactory
+  +toDomain(teacherDataModel) : Teacher
+  +toDataModel(teacher): TeacherDataModel
+}
+
+class TeacherIDMapperImpl {
+  +toDomain(teacherDataModel) : TeacherID
+  +toDataModel(teacher) : TeacherDataModel
+}
+
+class AddressMapperImpl {
+  +toDomain(addressDataModel) : Address
+  +toDataModel(address) : AddressDataModel
+}
+
+class TeacherAcademicEmailMapperImpl {
+  +toDomain(teacherAcademicEmailDataModel) : TeacherAcademicEmail
+  +toDataModel(teacherAcademicEmail) : TeacherAcademicEmailDataModel
+}
+
+class NIFMapperImpl {
+  +toDomain(NIFDataModel) : NIF
+  +toDataModel(NIF) : NIFDataModel
+}
+
+class PhoneNumberMapperImpl {
+  +toDomain(phoneNumberDataModel) : PhoneNumber
+  +toDataModel(phoneNumber : PhoneNumberDataModel
+}
+
+class TeacherDataModel {
+  -_name : String
+  -_email : String
+  -_academicBackground : String
+  +getName()
+  +getEmail()
+  +getNIF()
+  +getPhoneNumber()
+  +getAcademicBackground()
+  +getAddress()
+  +getTeacherAcademicEmail()
+}
+
+interface ITeacherMapper
+ITeacherMapper <|.. "1" TeacherMapperImpl : <<implements>>
+interface ITeacherCategoryMapper
+ITeacherCategoryMapper <|.. "1" TeacherCategoryMapperImpl : <<implements>>
+interface IDepartmentMapper
+IDepartmentMapper <|.. "1" DepartmentMapperImpl : <<implements>>
+interface ITeacherIDMapper
+ITeacherIDMapper <|.. "1" TeacherIDMapperImpl : <<implements>>
+interface IAddressMapper
+IAddressMapper <|.. "1" AddressMapperImpl : <<implements>>
+interface ITeacherAcademicEmailMapper
+ITeacherAcademicEmailMapper <|.. "1" TeacherAcademicEmailMapperImpl : <<implements>>
+interface INIFMapper
+INIFMapper <|.. "1" NIFMapperImpl : <<implements>>
+interface IPhoneNumberMapper
+IPhoneNumberMapper <|.. "1" PhoneNumberMapperImpl : <<implements>>
+
+'=== 9. CONNECTIONS WITH MULTIPLICITIES ==='
+'Services'
+
+'Controller Layer'
+US13_RegisterTeacherAndRelevantDataController "1" ..> "1" TeacherCategoryServiceImpl
+US13_RegisterTeacherAndRelevantDataController "1" ..> "1" DepartmentServiceImpl
+US13_RegisterTeacherAndRelevantDataController "1" ..> "1" TeacherServiceImpl
+
+'TeacherCategory Flow'
+TeacherCategoryServiceImpl "1" ..|>  ITeacherCategoryService : <<implements>>
+TeacherCategoryServiceImpl "1" --> ITeacherCategoryRepository
+TeacherCategoryRepositoryImpl "1".up.|> ITeacherCategoryRepository : <<implements>>
+ITeacherCategoryRepository --> "1" TeacherCategoryMapperImpl
+TeacherCategoryMapperImpl "1" --> ITeacherCategoryFactory
+TeacherCategoryFactoryImpl "1".up.|> ITeacherCategoryFactory : <<implements>>
+ITeacherCategoryFactory ..> "1" TeacherCategory : <<create>>
+ITeacherCategoryRepository ..|> IRepository : <<extends>>
+
+
+'Department Flow'
+DepartmentServiceImpl "1" ..|>  IDepartmentService : <<implements>>
+DepartmentServiceImpl "1" --> IDepartmentRepository
+DepartmentRepositoryImpl "1".up.|> IDepartmentRepository
+IDepartmentRepository  --> "1" DepartmentMapperImpl
+DepartmentMapperImpl "1" -->  IDepartmentFactory
+DepartmentFactoryImpl "1".up.|> IDepartmentFactory : <<implements>>
+IDepartmentFactory  ..> "1" Department : <<create>>
+IDepartmentRepository ..|> IRepository : <<extends>>
+
+
+'Teacher Registration Flow'
+TeacherServiceImpl "1" ..|>  ITeacherService : <<implements>>
+TeacherServiceImpl "1" -->  ITeacherRepository
+TeacherServiceImpl "1" -->  ITeacherFactory
+TeacherServiceImpl "1" -->  ITeacherCareerProgressionFactory
+TeacherRepositorySpringDataImpl "1".up.|> ITeacherRepository : <<implements>>
+ITeacherRepository "1" --> "*" Teacher
+ITeacherRepositorySpringData <|.. "\n 1   " TeacherRepositorySpringDataImpl : <<implements>>
+TeacherRepositorySpringDataImpl "1" ..> "_teacherMapper" TeacherMapperImpl
+TeacherRepositorySpringDataImpl "1" ..> "1" TeacherIDMapperImpl
+TeacherRepositorySpringDataImpl "1" ..> "1" NIFMapperImpl
+
+'Mappers
+TeacherMapperImpl "1" --> "1" TeacherDataModel
+TeacherMapperImpl "1" --> "1" Teacher
+TeacherMapperImpl "1" ..> "1" TeacherIDMapperImpl
+TeacherIDMapperImpl "1" --> "1" TeacherID
+TeacherIDMapperImpl "1" --> "_teacherIDDataModel" TeacherIDDataModel
+AddressMapperImpl "1" --> "_addressDataModel" AddressDataModel
+AddressMapperImpl "1" --> "1" Address
+NIFMapperImpl "1" --> "_nifDataMode" NIFDataModel
+NIFMapperImpl "1" --> "1" NIF
+PhoneNumberMapperImpl "1" --> "_phoneNumberDataModel" PhoneNumberDataModel
+PhoneNumberMapperImpl "1" --> "1" PhoneNumber
+TeacherAcademicEmailMapperImpl "1" --> "_teacherAcademicEmailDataModel" TeacherAcademicEmailDataModel
+TeacherAcademicEmailMapperImpl "1" --> "1" TeacherAcademicEmail
+
+
+
+ITeacherRepository ..|> IRepository : <<extends>>
+JpaRepository "\n 1 " <|.. ITeacherRepositorySpringData : <<extends>>
+
+
+
+'Factory Creation'
+TeacherFactoryImpl .up.|> ITeacherFactory : <<implements>>
+ITeacherFactory "1" ..> "1" Teacher : <<create>>
+ITeacherFactory "1" ..> "1" Address : <<create>>
+
+'Value Object Composition'
+Teacher "1" --> "_teacherID" TeacherID
+Teacher "1" --> "_name" Name
+Teacher "1" --> "_email" Email
+Teacher "1" --> "_nif" NIF
+Teacher "1" --> "_phoneNumber" PhoneNumber
+Teacher "1" --> "_academicBackground" AcademicBackground
+Teacher "1" --> "_address" Address
+Teacher "1" --> "_departmentID" DepartmentID
+TeacherAcronym "_teacherAcronym" <-- "1" TeacherID
+Department "1" -> "_teacherID" TeacherID
+Department "1" ---> "_name" Name
+Department "1" ---> "_departmentID" DepartmentID
+DepartmentID "1" --> "_acronym" Acronym
+
+TeacherCategory "1" --> "_name" Name
+
+Address "1" --> "_street" Street
+Address "1" --> "_postalCode" PostalCode
+Address "1" --> "_location" Location
+Address "1" --> "_country" Country
+
+'Career Progression Flow'
+TeacherCareerProgressionRepositoryImpl .up.|> ITeacherCareerProgressionRepository : <<implements>>
+TeacherCareerProgressionFactoryImpl .up.|> ITeacherCareerProgressionFactory: <<implements>>
+ITeacherCareerProgressionFactory "1" ..> "1" TeacherCareerProgression : <<create>>
+
+'Career Progression Relationships'
+TeacherCareerProgression "1" --> "_date" Date
+TeacherCareerProgression "1" --> "_teacherCategoryID" TeacherCategoryID
+TeacherCareerProgression "1" --> "_teacherID" TeacherID
+TeacherCareerProgression "1" --> "_workingPercentage" WorkingPercentage
+TeacherCareerProgression "1" --> "_teacher" Teacher
+TeacherCategory "1" --> "_teacherCategoryID" TeacherCategoryID
+ITeacherCareerProgressionRepository ..|> IRepository : <<extends>>
+
+'Data Model Relationships
+TeacherDataModel ---> "_teacherIDDataModel" TeacherIDDataModel
+TeacherDataModel ---> "_nifDataModel" NIFDataModel
+TeacherDataModel ---> "_phoneNumberDataModel" PhoneNumberDataModel
+TeacherDataModel ---> "_addressDataModel" AddressDataModel
+TeacherDataModel ---> "_teacherAcademicEmailDataModel" TeacherAcademicEmailDataModel
+@enduml

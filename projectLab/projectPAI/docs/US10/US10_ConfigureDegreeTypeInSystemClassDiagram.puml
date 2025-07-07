@@ -1,0 +1,64 @@
+@startuml
+title US10: Configure a DegreeType in System
+
+class US10_IWantToConfigureDegreeTypesLevelsController {
+     +US10_IWantToConfigureDegreeTypesLevelsController(degreeTypeService : DegreeTypeService)
+}
+
+class DegreeTypeService {
+    +DegreeTypeService(degreeTypeRepository : DegreeTypeRepository, degreeTypeFactory : DegreeTypeFactory)
+    +registerDegreeType(name: String, maxEcts: int): boolean
+    +addNewDegreeType(degreeType :
+}
+
+package "DegreeType" {
+entity "<<root>>\nDegreeType"  {
+    + nameIsInvalid(): boolean
+    + maxEctsIsInvalid(): boolean
+
+    }
+}
+
+class DegreeTypeID <<ValueObject>> {
+    id: Long
+        }
+
+class Name <<ValueObject>> {
+            Name: String
+                }
+
+class MaxECTS <<ValueObject>> {
+            maxEcts: int
+                }
+
+class DegreeTypeRepository {
+    +DegreeTypeRepository()
+    +registerDegreeType(name: String, maxEcts: int): boolean
+}
+
+interface IDegreeTypeRepository {
+    +DegreeTypeRepository()
+    +registerDegreeType(name: String, maxEcts: int)}
+
+class DegreeTypeFactoryImpl {
+    +addNewDegreeType(name: String, maxEcts: int): DegreeType
+}
+
+interface IDegreeTypeFactory {
+    +addNewDegreeType (name: String, maxEcts: int): DegreeType
+    }
+
+
+US10_IWantToConfigureDegreeTypesLevelsController "1" ..> "1" DegreeTypeService
+DegreeTypeService "1" ..> "1" IDegreeTypeRepository
+DegreeTypeService "1" ..> "1" IDegreeTypeFactory
+IDegreeTypeFactory "1" ..> "1" DegreeType
+IDegreeTypeFactory "1" <|.. "1" DegreeTypeFactoryImpl
+DegreeTypeRepository "1" ..|> "1" IDegreeTypeRepository
+"<<root>>\nDegreeType" --> "1" DegreeTypeID
+"<<root>>\nDegreeType" --> "1" Name
+"<<root>>\nDegreeType" --> "1" MaxECTS
+
+
+
+@enduml

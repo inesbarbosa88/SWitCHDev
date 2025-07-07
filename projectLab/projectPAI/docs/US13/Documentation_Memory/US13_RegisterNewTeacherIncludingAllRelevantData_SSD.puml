@@ -1,0 +1,24 @@
+@startuml
+
+title US13: As a HRC, I want to register a new teacher in the system, including all relevant data.
+
+actor HRC
+participant ":System" as System #Pink
+
+HRC -> System: I want to register a new teacher including all relevant data.\t
+activate System #silver
+System --> HRC: Choose a teacher category from the list
+HRC -> System: teacherCategory
+System --> HRC: Choose a department from the list
+HRC -> System: department
+System --> HRC: What are the attributes?
+HRC -> System: teacherAcronym, name, email, nif, phoneNumber,\nstreet, postalCode, location, country, academicBackground,\n workingPercentage, date, countryCode
+System --> HRC: Teacher registered!
+deactivate System
+
+
+Note Right HRC #Pink/White
+    **teacherCategory** = A Teacher Category already in system
+    **department** = A Department already in system
+End Note
+@enduml

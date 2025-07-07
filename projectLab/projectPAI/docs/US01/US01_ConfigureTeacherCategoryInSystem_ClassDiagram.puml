@@ -1,0 +1,61 @@
+@startuml
+!pragma layout smetana
+
+package "PAI.domain" {
+    class TeacherCategory {
+        - _name: String
+        + TeacherCategory(categoryName: String)
+        + getName(): String
+        + equals(obj: Object): boolean
+        + hashCode(): int
+    }
+}
+
+package "PAI.factory" {
+    interface TeacherCategoryFactoryInterface {
+        + createTeacherCategory(categoryName: String): TeacherCategory
+    }
+
+    class TeacherCategoryFactoryImpl {
+        + createTeacherCategory(categoryName: String): TeacherCategory
+    }
+
+    interface TeacherCategoryRepositoryListFactoryInterface {
+        + getTeacherCategoryList(): List<TeacherCategory>
+    }
+
+    class TeacherCategoryRepositoryListFactoryImpl {
+        + getTeacherCategoryList(): List<TeacherCategory>
+    }
+}
+
+package "PAI.repository" {
+    class TeacherCategoryRepository {
+        - teacherCategoryRepositoryList: List<TeacherCategory>
+        - teacherCategoryFactory: TeacherCategoryFactoryImpl
+        + TeacherCategoryRepository(teacherCategoryFactory: TeacherCategoryFactoryImpl, teacherCategoryRepositoryListFactory: TeacherCategoryRepositoryListFactoryImpl)
+        + registerTeacherCategory(name: String): boolean
+        + getTeacherCategoryByName(name: String): Optional<TeacherCategory>
+        + getTeacherCategoryList(): List<TeacherCategory>
+    }
+}
+
+' Placeholder for List<TeacherCategory>
+class "List<TeacherCategory>" as ListTeacherCategory
+
+' Implementations (Realization)
+TeacherCategoryFactoryInterface <|.. TeacherCategoryFactoryImpl
+TeacherCategoryRepositoryListFactoryInterface <|.. TeacherCategoryRepositoryListFactoryImpl
+
+' Factory Dependencies
+TeacherCategoryRepository ..> TeacherCategoryFactoryImpl : uses  ' TeacherCategoryRepository depends on TeacherCategoryFactoryImpl for creating TeacherCategory instances.
+TeacherCategoryRepository ..> TeacherCategoryRepositoryListFactoryImpl : uses  ' TeacherCategoryRepository depends on TeacherCategoryRepositoryListFactoryImpl to get the list of TeacherCategory.
+
+' Associations
+TeacherCategoryRepository "1" --> "*" TeacherCategory : teacherCategoryRepositoryList  ' TeacherCategoryRepository contains a list of TeacherCategory objects.
+
+' Explicitly show List<TeacherCategory> dependency
+TeacherCategoryRepositoryListFactoryImpl ..> ListTeacherCategory : returns  ' TeacherCategoryRepositoryListFactoryImpl returns a List<TeacherCategory>.
+TeacherCategoryRepository ..> ListTeacherCategory : contains  ' TeacherCategoryRepository contains a List<TeacherCategory>.
+
+@enduml

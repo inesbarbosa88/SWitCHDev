@@ -1,0 +1,68 @@
+@startuml
+skinparam sequence {
+    LifeLineBorderColor Grey
+    LifeLineBackgroundColor HoneyDew
+}
+
+title US28: As an ASC, I want to remove the enrolment of a student in a course edition - Sequence Diagram
+
+actor ASC #Orange/White
+participant ":UI" as UI
+participant ":US28_Controller" as Controller
+participant ":ICourseEditionEnrolmentRepository" as IRepo
+participant ":CourseEditionEnrolmentRepositoryImpl" as RepoImpl
+participant "cee:CourseEditionEnrolment" as Enrolment
+autonumber
+
+ASC -> UI : I want to remove the enrolment\n of a student in a course edition
+activate UI
+UI --> ASC : What is the student ID?
+deactivate UI
+ASC -> UI : Student ID!
+activate UI
+UI --> ASC : What is the course edition ID?
+deactivate UI
+ASC -> UI : Course edition ID!
+activate UI
+
+UI -> Controller : removeStudentEnrolment\n(studentID, courseEditionID)
+activate Controller
+
+note right of Controller
+ICourseEditionEnrolmentRepository is injected into the controller.
+The interface delegates operations to CourseEditionEnrolmentRepositoryImpl,
+which handles the actual data persistence. This is why both are
+represented in this sequence diagram.
+end note
+
+Controller -> IRepo : removeEnrolment\n(studentID, courseEditionID)
+activate IRepo
+
+IRepo -> RepoImpl : removeEnrolment\n(studentID, courseEditionID)
+activate RepoImpl
+
+ref over RepoImpl
+      SD  cee:findByStudentAndEdition\n(studentID, courseEditionID)
+end ref
+RepoImpl -> Enrolment : isEnrolmentActive()
+activate Enrolment
+Enrolment --> RepoImpl : true
+deactivate Enrolment
+
+RepoImpl -> Enrolment : deactivateEnrolment()
+activate Enrolment
+Enrolment --> RepoImpl : Enrolment status set to inactive
+deactivate Enrolment
+
+RepoImpl --> IRepo : true
+deactivate RepoImpl
+
+IRepo --> Controller : true
+deactivate IRepo
+
+Controller --> UI : true
+deactivate Controller
+UI --> ASC : Enrolment successfully removed
+deactivate UI
+
+@enduml

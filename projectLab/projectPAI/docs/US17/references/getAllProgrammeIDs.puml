@@ -1,0 +1,25 @@
+@startuml
+participant ":IProgrammeService" as ProgrammeService
+participant ":IProgrammeRepository" as ProgrammeRepository
+participant ":Programme" as Programme
+participant "List<ProgrammeID>" as ProgrammeIDList
+
+ProgrammeService -> ProgrammeRepository : findAll()
+activate ProgrammeRepository
+ProgrammeRepository --> ProgrammeService : ProgrammeList
+deactivate ProgrammeRepository
+
+ProgrammeService -> ProgrammeIDList : create()
+activate ProgrammeIDList
+
+loop for each Programme in ProgrammeList
+    ProgrammeService -> Programme : getProgrammeID()
+    activate Programme
+    Programme --> ProgrammeService : ProgrammeID
+    deactivate Programme
+
+    ProgrammeService -> ProgrammeIDList : add(ProgrammeID)
+end
+
+deactivate ProgrammeIDList
+@enduml

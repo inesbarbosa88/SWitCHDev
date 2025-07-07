@@ -1,0 +1,76 @@
+@startuml
+actor admin
+autonumber
+
+title: US01 - Sequence Diagram - Configure TeacherCategory (Spring Data JPA)
+
+skinparam sequence {
+  ParticipantFontSize 16
+  ActorFontSize 16
+  FontSize 14
+  LifeLineBorderColor DarkSlateGray
+  LifeLineBackgroundColor #E6F2E6
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+  ArrowColor Black
+  ArrowThickness 1
+  FontName Helvetica
+}
+skinparam nodesep 100
+skinparam ranksep 120
+skinparam linetype ortho
+
+participant UI
+participant "US01_ConfigureTeacherCategoryController" as Controller
+participant "TeacherCategoryApplicationService" as AppService
+participant "Name" as NameVO
+participant "TeacherCategoryFactorySpring" as Factory
+participant "TeacherCategory" as DomainAggregate
+participant "TeacherCategoryMapperImpl" as Mapper
+participant "TeacherCategoryRepositorySpringDataImpl" as Repo
+participant "TeacherCategoryDataModel" as DataModel
+
+== UI Interaction ==
+
+admin -> UI ++ : "I want to register a new TeacherCategory"
+UI --> admin -- : "Please provide category name"
+
+admin -> UI ++ : "Assistente"
+UI -> Controller ++ : configureTeacherCategory("Assistente")
+
+== Controller delegates to Service ==
+
+Controller -> AppService ++ : registerCategory("Assistente")
+
+== Value Object Creation ==
+
+AppService -> NameVO ++ : new Name("Assistente")
+NameVO --> AppService -- : validated Name
+
+== Check Existence in Repository ==
+
+AppService -> Repo ++ : existsByName(name)
+Repo --> AppService -- : false
+
+== Aggregate Creation using Factory ==
+
+AppService -> Factory ++ : createTeacherCategory(name)
+Factory -> DomainAggregate ++ : new TeacherCategory(id, name)
+Factory --> AppService -- : TeacherCategory
+
+== Persistence Layer ==
+
+AppService -> Repo ++ : save(TeacherCategory)
+Repo -> Mapper ++ : toDataModel(TeacherCategory)
+Mapper -> DataModel ++ : create(id, name)
+Mapper --> Repo -- : TeacherCategoryDataModel
+Repo -> Repo ++ : save(TeacherCategoryDataModel)
+Repo --> AppService -- : TeacherCategory
+
+== Response to UI ==
+
+AppService --> Controller -- : true
+Controller --> UI -- : true
+UI --> admin -- : "TeacherCategory 'Assistente' registered successfully"
+
+@enduml

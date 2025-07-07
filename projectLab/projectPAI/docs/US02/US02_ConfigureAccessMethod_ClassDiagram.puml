@@ -1,0 +1,90 @@
+@startuml
+
+skinparam linetype ortho
+
+package "AccessMethod Aggregate" {
+    entity "<<Root>>\n <<Entity>>\n AccessMethod" as AME{
+    + AccessMethod(accessMethodId: AccessMethodId, accessMethodName: NameWithNumbersAndSpecialChars)
+    + Equals(Object objectToCompare)
+    }
+    class "<<Value Object>>\n NameWithNumbersAndSpecialChars" as VOName{
+        - accessMethodName: String
+        + Equals(Object objectToCompare)
+    }
+
+    class "<<Value Object>>\n AccessMethodId" as VOId{
+        - id: String
+        + Equals(Object objectToCompare)
+    }
+}
+
+'uses
+AME "1" --> "uses 1" VOName
+AME "1" --> "uses 1" VOId
+
+
+interface IAccessMethodService{
+    registerAccessMethod(accessMethodNameVO)
+}
+
+class IAccessMethodServiceImpl{
+    + registerAccessMethod(accessMethodNameVO)
+}
+
+interface IAccessMethodFactory {
+    createAccessMethod(accessMethodName: NameWithNumbersAndSpecialChars)
+}
+
+class AccessMethodFactoryImpl {
+     +createAccessMethod(accessMethodName: NameWithNumbersAndSpecialChars)
+}
+'implements
+AccessMethodFactoryImpl ..|> "implements"  IAccessMethodFactory
+
+
+Interface IAccessMethodListFactory {
+ createAccessMethodList() : List<AccessMethod>
+}
+
+class AccessMethodListFactoryImpl {
+    +createAccessMethodList() : ArrayList<AccessMethod>
+}
+'implements
+AccessMethodListFactoryImpl ..|> IAccessMethodListFactory : implements
+
+
+Interface IRepository{
+}
+Interface IAccessMethodRepository{
+    registerAccessMethod(accessMethod: AccessMethod);
+}
+
+'extends
+IAccessMethodRepository --|> IRepository : extends
+
+class AccessMethodRepositoryImpl {
+    registerAccessMethod(accessMethod: AccessMethod)
+}
+
+'implements
+AccessMethodRepositoryImpl ..|>  IAccessMethodRepository : implements
+
+'uses
+AccessMethodRepositoryImpl "1" --> "uses 1" IAccessMethodListFactory
+
+class US02_ConfigureAccessMethod_Controller {
+    +US02_ConfigureAccessMethod_Controller(accessMethodRepository : IAccessMethodRepository, accessMethodFactory : IAccessMethodFactory)
+    +createAccessMethod(accessMethodName: NameWithNumbersAndSpecialChars)
+}
+
+class NameWithNumbersAndSpecialChars {
+}
+
+US02_ConfigureAccessMethod_Controller "1"->"1..*"NameWithNumbersAndSpecialChars: uses
+IAccessMethodFactory "1" ..> "1..*" AME : creates
+IAccessMethodRepository "1"..> "*" AME: persist
+US02_ConfigureAccessMethod_Controller "1"-down->"1" IAccessMethodService: uses
+IAccessMethodService "1"--> "1" IAccessMethodRepository : uses
+IAccessMethodService "1"--> "1" IAccessMethodFactory : uses
+IAccessMethodServiceImpl "1"-right..|>"1" IAccessMethodService: implements
+@enduml

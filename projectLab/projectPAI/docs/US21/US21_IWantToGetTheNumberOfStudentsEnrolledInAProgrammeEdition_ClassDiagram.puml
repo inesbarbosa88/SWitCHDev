@@ -1,0 +1,62 @@
+@startuml
+
+title: US21_GET THE NUMBER OF STUDENTS ENROLLED IN A PROGRAMME EDITION SEQUENCE_CLASS DIAGRAM
+
+class US21_IWantToGetTheNumberOfStudentsEnrolledInAProgrammeEditionController {
+    -_programmeEditionRepository: ProgrammeEditionRepository
+    -_programmeEditionEnrollmentRepo: ProgrammeEditionEnrolmentRepo
+    +US21_IWantToGetTheNumberOfStudentsEnrolledInAProgrammeEditionController(programmeEditionEnrollmentRepo: ProgrammeEditionEnrolmentRepo, programmeEditionRepository: ProgrammeEditionRepository, programmeList ProgrammeList)
+    +iWantToGetTheNumberOfStudentsEnrolledInAProgrammeEdition(programmeEdition: ProgrammeEdition)
+    +getAllProgrammeEditions(): List<ProgrammeEdition>
+}
+
+class ProgrammeEditionEnrolmentRepo {
+    -_programmeEditionEnrolments: Set<ProgrammeEditionEnrolment>
+    -_programmeEditionEnrolments: ProgrammeEditionEnrolmentFactoryImpl
+    +ProgrammeEditionEnrolmentRepo(programmeEditionEnrollmentFactory: ProgrammeEditionEnrolmentFactoryImpl, programmeEditionEnrolmentListFactory: ProgrammeEditionEnrolmentListFactory)
+    +enrolStudentInProgrammeEdition(student: Student, programmeEdition: ProgrammeEdition)
+    +isStudentEnrolledInThisProgrammeEdition(student: Student, programmeEdition: ProgrammeEdition)
+    +countStudentsInProgrammesFromDepartmentInSchoolYear(department: Department, schoolYear: SchoolYear)
+    +getTheNumberOfStudentsEnrolledInAProgrammeEdition(programmeEdition: ProgrammeEdition)
+    +findProgrammeEditionsThatStudentIsEnrolled(student: Student)
+}
+
+class ProgrammeEditionRepository {
+    -_IprogrammeEditionFactory: IProgrammeEditionFactory
+    -_ProgrammeEditions: List<ProgrammeEdition>
+    +ProgrammeEditionRepository(iProgrammeEditionFactory: IProgrammeEditionFactory, iProgrammeEditionListFactory: IProgrammeEditionListFactory)
+    +createProgrammeEdition(programme: Programme, schoolYear: SchoolYear)
+    +findProgrammeEditionBySchoolYearAndProgramme(programme: Programme, schoolYear: SchoolYear)
+    +getAllProgrammeEditions()
+    +findProgrammeInProgrammeEdition(programmeEdition: ProgrammeEdition)
+}
+
+class ProgrammeEditionEnrolment {
+    -_student: Student
+    -_programmeEdition: ProgrammeEdition
+    -_enrolmentDate: LocalDate
+    +ProgrammeEditionEnrolment(student: Student, programmeEdition: ProgrammeEdition)
+    +isEnrolmentAssociatedToDepartmentAndSchoolYear(department: Department, schoolYear: SchoolYear)
+    +getStudentUniqueNumber()
+    +equals (obj: Object)
+    +findProgrammeEditionInEnrollment()
+    +findStudentInProgrammeEdition()
+}
+
+class ProgrammeEdition {
+    -_programme: Programme
+    -_schoolYear: SchoolYear
+    +ProgrammeEdition(programme: Programme,schoolYear: SchoolYear)
+    +equals(other: Object)
+    +findProgrammeInProgrammeEdition()
+    +findSchoolYearInProgrammeEdition()
+    +isEditionAssociatedToDepartmentAndSchoolYear(department: Department, schoolYear: SchoolYear)
+}
+
+
+US21_IWantToGetTheNumberOfStudentsEnrolledInAProgrammeEditionController "1" ..> "1" ProgrammeEditionRepository
+US21_IWantToGetTheNumberOfStudentsEnrolledInAProgrammeEditionController "1" ..> "1" ProgrammeEditionEnrolmentRepo
+ProgrammeEditionEnrolmentRepo "1" --> "_programmeEditionEnrolments *" ProgrammeEditionEnrolment
+ProgrammeEditionRepository "1" --> "_programmeEditions *" ProgrammeEdition
+
+@enduml

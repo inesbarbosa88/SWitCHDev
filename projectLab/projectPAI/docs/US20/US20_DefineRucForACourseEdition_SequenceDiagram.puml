@@ -1,0 +1,56 @@
+@startuml
+
+autonumber
+
+title: US20_Define Ruc for a Course Edition Sequence Diagram
+
+actor ProgrammmeDirector as PD
+participant UI #application
+participant ":DefineRucForCourseEditionController" as C #application
+participant ":CourseEditionRepository" as CER #application
+participant ":TeacherRepository" as TR #application
+participant  "cE1:CourseEdition" as CE #application
+participant "cEL1:List<CourseEdition>" as LCE
+participant "tL1:List<Teacher>" as LT
+
+
+PD -> UI ++ #application: I want to define the RUC for a Course Edition
+UI -> C  : getCourseEdition()
+activate C #application
+C -> CER :getCourseEdition()
+activate CER #application
+C <-- CER : cEL1
+deactivate CER
+UI <-- C : cEL1
+deactivate C
+PD <-- UI --: Course Edition?
+PD -> UI ++ #application: Course Edition 1
+UI-> C : getTeachers()
+activate C #application
+C -> TR :getTeachers()
+activate TR #application
+TR --> C :tL1
+deactivate TR
+C --> UI :tL1
+deactivate C
+PD <-- UI -- : Teacher?
+PD -> UI: Teacher 1
+activate UI #application
+UI -> C : defineRucForCourseEdition(ce1, t1)
+activate C #application
+C -> CER : setRucInACourseEdition(ce1,t1)
+activate CER #application
+CER -> CE : setRuc(t1)
+activate CE #application
+CE --> CER :True
+deactivate CE
+CER --> C :True
+deactivate CER
+deactivate CE
+C --> UI :True
+deactivate C
+UI --> PD : Ruc defined.
+deactivate UI
+
+
+@enduml

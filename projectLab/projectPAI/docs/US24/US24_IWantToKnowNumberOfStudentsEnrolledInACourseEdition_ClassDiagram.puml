@@ -1,0 +1,62 @@
+@startuml
+
+!pragma layout smetana
+
+
+    class US24_IWantToKnowTheNumberOfStudentsEnrolledInACourseEditionController {
+        +US24_IWantToKnowTheNumberOfStudentsEnrolledInACourseEditionController()
+        +getNumberOfStudentsEnrolled(CourseEditionID courseEditionId)
+    }
+
+    class "CourseEditionEnrolmentRepositoryImpl" as CourseEditionEnrolmentRepository {
+        -_courseEditionEnrolments: List<CourseEditionEnrolment>
+        +CourseEditionEnrolmentRepository()
+        +numberOfStudentsEnrolledInCourseEdition(CourseEditionID courseEditionId)
+    }
+
+
+package "CourseEditionEnrolmentAggr" {
+    entity "<<root>>\nCourseEditionEnrolment" as CourseEditionEnrolment {
+        +CourseEditionEnrolment(studentID: StudentID, courseEditionID: CourseEditionID)
+                 +equals (obj: Object): boolean
+                 +knowCourseEdition(): CourseEditionID
+    }
+}
+
+    class "<<ValueObject>>\nEnrolmentDate" as EnrolmentDate {
+        -_enrolmentDate: LocalDate
+        }
+
+    class "<<ValueObject>>\nStudentId" as StudentId {
+        -_studentID: int
+        }
+
+    class "<<ValueObject>>\nCourseEditionId" as CourseEditionId {
+        -_courseEditionID: int
+        }
+
+    class "<<ValueObject>>\nCourseEditionEnrolmentId" as CourseEditionEnrolmentId {
+        -_courseEditionEnrolmentID: int
+            }
+
+class CourseEditionEnrolmentFactoryImpl {
+        +createEnrolment(StudentID studentID, CourseEditionID courseEditionID, EnrolmentDate enrolmentDate): CourseEditionEnrolment
+    }
+
+interface ICourseEditionEnrolmentFactory {
+        +createEnrolment(StudentID studentID, CourseEditionID courseEditionID, EnrolmentDate enrolmentDate): CourseEditionEnrolment
+    }
+
+
+US24_IWantToKnowTheNumberOfStudentsEnrolledInACourseEditionController "1  " ---> "1  " CourseEditionEnrolmentRepository
+CourseEditionEnrolmentRepository "List<CourseEditionEnrolment>          " -----> "1..*" CourseEditionEnrolment
+CourseEditionEnrolmentFactoryImpl ...|> ICourseEditionEnrolmentFactory
+CourseEditionEnrolment "\n creates" <...... CourseEditionEnrolmentFactoryImpl
+
+CourseEditionEnrolment "\n *" ---> "1          " CourseEditionId
+CourseEditionEnrolment "\n *" -----> "1   " StudentId
+CourseEditionEnrolment "\n *" ---> "1" EnrolmentDate
+CourseEditionEnrolment "\n *" ---> "1     " CourseEditionEnrolmentId
+
+CourseEditionEnrolmentRepository ---> "1  " CourseEditionEnrolmentId
+@enduml

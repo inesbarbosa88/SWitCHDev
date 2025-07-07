@@ -1,0 +1,41 @@
+@startuml
+actor ProgrammeDirector
+participant ":UI" as UI
+participant ":US23_IWantToKnowTheApprovalPercentageOfACourseEditionController" as KA
+participant ":CourseEditionRepository" as CER
+participant ":StudentGradeRepository" as GR
+participant ":StudentGrade" as StudentGrade
+
+autonumber
+
+
+ProgrammeDirector -> UI ++ #application: I want to know approval percentage of Course Edition
+UI --> ProgrammeDirector -- : Course Edition?
+ProgrammeDirector -> UI ++ #application: CourseEdition1 !
+UI -> KA ++ #application : CalculateApprovalPercentageOfACourseEdition(courseEdition1)
+KA -> CER ++ #application : findCourseEditionID (courseEdition1)
+CER -> KA :  :ceIdVO1
+deactivate CER
+KA -> GR ++ #application : knowApprovalRate(:ceIdVO1)
+
+
+    GR -> GR :Approval = 0
+loop for each StudentGrade in GR
+    GR -> StudentGrade : hasThisCourseEdition(:ceIdVO1)
+    activate StudentGrade #application
+    StudentGrade --> GR : True!
+    deactivate StudentGrade
+
+    GR -> StudentGrade : knowGrade()
+    activate StudentGrade #application
+    StudentGrade --> GR : grade
+    deactivate StudentGrade
+    GR -> GR : Calculate Approval Percentage
+end
+
+
+GR --> KA --: Know Approval Percentage of CourseEdition1
+KA --> UI --: Know Approval Percentage of CourseEdition1
+UI --> ProgrammeDirector --: Know Approval Percentage of courseEdition1
+
+@enduml

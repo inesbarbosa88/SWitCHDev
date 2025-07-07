@@ -1,0 +1,143 @@
+@startuml
+!pragma layout smetana
+skinparam linetype polyline
+left to right direction
+hide empty methods
+hide empty members
+title "Domain Diagram"
+
+' Entities
+entity Facility {
+}
+
+entity "School Year" {
+  description
+  startDate
+  endDate
+}
+
+entity Department {
+  name
+  acronym
+}
+
+entity Course {
+  name
+  acronym
+  qtyECTS
+}
+
+entity Course_Edition {
+}
+
+entity Address {
+  postalCode
+  street
+  city
+  country
+}
+
+entity "Teacher Category" {
+  categoryName
+}
+
+entity Teacher {
+  name
+  acronym
+  NIF
+  email
+  phoneNumber
+  academicBackground
+}
+
+entity Programme {
+  name
+  acronym
+  qtyECTS
+  qtySemesters
+}
+
+entity ProgrammeEdition {
+  schoolYear
+}
+entity Enrolment {
+}
+
+entity ProgrammeEditionEnrolment {
+   date
+}
+
+entity CourseEditionEnrolment {
+   date
+}
+
+entity Student {
+  uniqueNumber
+  name
+  NIF
+  phoneNumber
+  email
+  listOfGrades
+  institutionalEmail
+}
+
+entity "Degree Type" {
+  name
+  maxECTS
+}
+
+entity "Access Method" {
+  name
+}
+
+entity "Grade Student" {
+  grade
+  date
+}
+
+entity "studyPlan" {
+}
+
+entity "Teacher Career Progression" {
+  workingPercentage
+  date
+}
+
+entity "CourseInStudyPlan" {
+  CurricularYear
+  Semester
+}
+
+
+Facility "1..*" -- "1" Department : Aggregates <
+Department "1" --- "1   " Teacher : Department Director oversees <
+Department "1" --- "*" Teacher : Aggregates >
+Course "*" -- "*" Teacher : Teaches <
+Course_Edition "*" -- "0,1" Teacher : RUC oversees <
+Course "1" ----- "*" Course_Edition : > Is organized
+Programme "1" -left- "*" Course : > Aggregates
+Programme "1" --up-- "1" "studyPlan" : > Aggregates
+"CourseInStudyPlan" "*" -- "1" Programme : > Belongs
+"studyPlan" "1" ---- "*" "CourseInStudyPlan" : \n\n< Belongs\n\n
+"CourseInStudyPlan" "0..1" -- "1" Course : < Happens
+ProgrammeEdition "1" -- "*" Course_Edition : < Belongs
+"School Year" "1" -- "*" ProgrammeEdition : < Runs in
+Address "1" -up- "1" Student : Has <
+Teacher "1" -- "1" Address : Has >
+"Teacher Career Progression" "*" -- "1" "Teacher Category" : Comprises >
+Programme "1" -- "*" Enrolment : Has >
+ProgrammeEdition "*" -- "1" Programme : < Is organized
+ProgrammeEdition "1" -- "*" ProgrammeEditionEnrolment : < Happens
+ProgrammeEditionEnrolment "*" -- "1" Student : < Enrols
+Student "1" --- "*" CourseEditionEnrolment : > Enrols
+CourseEditionEnrolment "*" -- "1" Course_Edition : > Relates to
+Programme "*" -- "1" Department : Assigned to >
+Student "1" -- "*" "Grade Student" : < Belongs
+"Grade Student" "*" -- "1" Course_Edition : > Refers to
+
+Programme "1..*" -- "1  " Teacher : Programme Director oversees <
+Programme "*" -- "1" "Degree Type" : Has >
+Student "1" -- "1..*" Enrolment : Enrols >
+Enrolment "1..*" -- "1" "Access Method" : Has >
+"Teacher Career Progression" "1..*" -- "1" "Teacher" : Has <
+@enduml

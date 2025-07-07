@@ -1,0 +1,160 @@
+@startuml
+skinparam sequenceMessageAlign center
+autonumber
+skinparam sequenceLifeLineBackgroundColor PowderBlue
+
+title US13: As a HRC, I want to register a new teacher in the system, including all relevant data.
+
+actor HRC
+participant ":UI" as UI #Cyan/Silver
+participant ":Controller" as Controller #Cyan/Silver
+participant ":ITeacherCategoryRepository" as TeacherCategoryRepository <<Interface>> #Cyan/Silver
+participant "tcList :List<TeacherCategories>" as tcList #Yellow/Silver
+participant ":IDepartmentRepository" as DepartmentRepository <<Interface>> #Cyan/Silver
+participant "deptSet :Set<Departments>" as dptList #Yellow/Silver
+participant ":ITeacherRepository" as TeacherRepository <<Interface>> #Cyan/Silver
+participant ":TeacherFactoryImpl" as TeacherFactory #Yellow/Silver
+participant "t1 :Teacher" as Teacher #Yellow/Silver
+participant "addrsVO1 :Address" as Address #Yellow/Silver
+participant "teacherIDVO1 :TeacherID" as TeacherID #Yellow/silver
+participant ":ITeacherCareerProgressionRepository" as TeacherCareerProgressionRepository <<Interface>> #Cyan/Silver
+participant ":TeacherCareerProgressionFactoryImpl" as TeacherCareerProgressionFactory #Yellow/Silver
+participant "tcp1 :TeacherCareerProgression" as TeacherCareerProgression #Yellow/Silver
+participant "TeacherAcademicEmailVO1 : TeacherAcademicEmail" as TeacherAcademicEmail #Yellow/Silver
+
+activate HRC
+HRC -> UI: I want to register a new teacher including\n all relevant data.
+activate UI
+
+UI -> Controller: **getTeacherCategoriesList()**
+activate Controller
+
+Controller -> TeacherCategoryRepository: **findAll()**
+activate TeacherCategoryRepository
+
+TeacherCategoryRepository --> Controller: tcList
+deactivate TeacherCategoryRepository
+|||
+ref over Controller
+    \t \t Convert Domain to DTO \t
+end ref
+
+Controller --> UI: tcListDTO
+deactivate Controller
+
+UI --> HRC: Choose a teacher category from the list.
+
+HRC -> UI: Teacher Category
+
+UI -> Controller: **getDepartments()**
+activate Controller
+
+Controller -> DepartmentRepository: **findAll()**
+activate DepartmentRepository
+
+DepartmentRepository --> Controller: deptList
+deactivate DepartmentRepository
+|||
+ref over Controller
+    \t \t Convert Domain to DTO \t
+end ref
+
+Controller --> UI: deptListDTO
+deactivate Controller
+
+UI --> HRC: Choose a department from the list.
+|||
+HRC -> UI: department
+|||
+UI --> HRC: What are the attributes?
+|||
+HRC -> UI: teacher acronym, name, email, nif,\n phone number, street, postal code, location,   \n country, academic background,\n working percentage, date, countryCode
+
+Note Right UI #Pink/White
+    **teacherCategoryID** = A Teacher Category already in system
+    **departmentID** = A Department already in system
+End Note
+
+'--- Start of registerTeacher will all inputs ---
+
+UI -> Controller: **registerTeacher**(teacherAcronym, name, email,\n nif, phoneNumber, street, postalCode,\n location, country, academicBackground, workingPercentage,\n date, teacherCategoryID, departmentAcronym, countryCode)
+activate Controller
+|||
+ref over Controller
+    \t \t Convert DTO to VO \t
+end ref
+|||
+Controller -> TeacherRepository:\t **registerTeacher**(teacherAcronymVO, nameVO, emailVO, nifVO, phoneNumberVO, streetVO,\n postalCodeVO, locationVO, countryVO, academicBackgroundVO, departmentIDVO)
+activate TeacherRepository
+
+TeacherRepository -> TeacherFactory: **createTeacher**(teacherAcronymVO, nameVO, emailVO,\n nifVO, phoneNumberVO, streetVO,\n postalCodeVO, locationVO, countryVO,\n academicBackgroundVO, departmentIDVO)
+activate TeacherFactory
+
+TeacherFactory -> Address **: **createAddress**(streetVO, postalCodeVO, locationVO, countryVO)
+activate Address
+|||
+Address --> TeacherFactory:\t addrsVO1
+deactivate Address
+|||
+TeacherFactory -> Teacher **: **createTeacher**(teacherAcronymVO, nameVO, emailVO,\n nifVO, phoneNumberVO, addrsVO1,\n academicBackgroundVO, departmentIDVO)
+activate Teacher
+
+Teacher -> TeacherID **: **createTeacherID**(teacherAcronymVO)
+activate TeacherID
+|||
+TeacherID --> Teacher: TeacherIDVO1
+deactivate TeacherID
+Teacher --> TeacherFactory: \t t1
+
+Teacher -> TeacherAcademicEmail **: **createTeacherAcademicEmail**(teacherAcronymVO)
+activate TeacherAcademicEmail
+|||
+TeacherAcademicEmail --> Teacher: TeacherAcademicEmailVO1
+deactivate TeacherAcademicEmail
+Teacher --> TeacherFactory: \t TeacherAcademicEmailVO1
+deactivate Teacher
+
+TeacherFactory --> TeacherRepository: t1
+deactivate TeacherFactory
+|||
+activate Teacher
+ref over TeacherRepository, Teacher
+    Check if a teacher is already registered
+end ref
+|||
+TeacherRepository -> TeacherRepository: **save** (t1)
+deactivate Teacher
+
+TeacherRepository -> Teacher: **identity()**
+activate Teacher
+|||
+Teacher --> TeacherRepository: teacherIDVO1
+deactivate Teacher
+
+TeacherRepository --> Controller: teacherIDVO1
+deactivate TeacherRepository
+|||
+Controller -> TeacherCareerProgressionRepository: **registerTeacherCareerProgression**(dateVO, teacherCategoryIDVO, workingPercentageVO, teacherIDVO1)
+activate TeacherCareerProgressionRepository
+
+TeacherCareerProgressionRepository -> TeacherCareerProgressionFactory: **createTeacherCareerProgression**(dateVO,\n teacherCategoryIDVO,\n workingPercentageVO, teacherIDVO1)
+activate TeacherCareerProgressionFactory
+
+TeacherCareerProgressionFactory -> TeacherCareerProgression **: **createTeacherCarrerProgression**(dateVO,\n teacherCategoryIDVO,\n workingPercentageVO, teacherIDVO1)
+activate TeacherCareerProgression
+|||
+TeacherCareerProgression --> TeacherCareerProgressionFactory: \ttcp1
+deactivate TeacherCareerProgression
+TeacherCareerProgressionFactory --> TeacherCareerProgressionRepository: \ttcp1
+deactivate TeacherCareerProgressionFactory
+|||
+TeacherCareerProgressionRepository -> TeacherCareerProgressionRepository: **save** (tcp1)
+TeacherCareerProgressionRepository --> Controller: True
+deactivate TeacherCareerProgressionRepository
+Controller --> UI: True
+deactivate Controller
+
+UI --> HRC: Success!
+deactivate UI
+|||
+@enduml

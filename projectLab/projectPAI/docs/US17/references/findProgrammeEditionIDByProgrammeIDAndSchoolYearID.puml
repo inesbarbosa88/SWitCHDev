@@ -1,0 +1,18 @@
+@startuml
+participant ":IProgrammeEditionRepository" as ProgrammeEditionRepository
+participant ":IProgrammeEditionRepositorySpringData" as ProgrammeEditionRepositorySpringData
+
+
+ProgrammeEditionRepository -> ProgrammeEditionRepositorySpringData : findProgrammeEditionIDDataModelByProgrammeIDAndSchoolYearID\nDatasModels(programmeIDDataModel, schoolYearIDDataModel)
+activate ProgrammeEditionRepositorySpringData
+ProgrammeEditionRepositorySpringData --> ProgrammeEditionRepository : ProgrammeEditionIDDataModel
+deactivate ProgrammeEditionRepositorySpringData
+
+alt ID found
+    ProgrammeEditionRepository -> ProgrammeEditionIDDataModel : map(programmeEditionIdDataModel)
+    activate ProgrammeEditionIDDataModel
+    ProgrammeEditionIDDataModel --> ProgrammeEditionRepository : ProgrammeEditionID
+    deactivate ProgrammeEditionIDDataModel
+
+end
+@enduml

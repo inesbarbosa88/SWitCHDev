@@ -1,0 +1,53 @@
+@startuml
+title US05: Register a Department in the System
+'left to right direction'
+
+class US05_RegisterADepartmentController {
+    +US05_RegisterADepartmentController(departmentRepo: DepartmentRepository)
+    +registerDepartment(acronym: String, name: String): boolean
+}
+
+class Department {
+    -_acronym:String
+    -_name:String
+    +Department(departmentAcronym: String, departmentName: String)
+    +getName(): String
+    +getAcronym(): String
+}
+
+class DepartmentRepository {
+    +DepartmentRepository(departmentFactoryInterface: DepartmentFactory, departmentListFactoryInterface: DepartmentListFactory )
+    +registerDepartment(departmentAcronym: String, departmentName: String) :boolean
+}
+
+class DepartmentFactoryImpl {
+    +newDepartment(acronym: String, name: String): Department
+}
+
+interface IDepartmentFactory {
+    +newDepartment(acronym: String, name: String): Department
+}
+
+class DepartmentListFactoryImpl {
+    +newDepartmentList: HashSet<Department>
+}
+
+interface IDepartmentListFactory {
+    + newDepartmentList(): HashSet<Department>
+}
+
+interface Set {
+    +add(): boolean
+}
+
+DepartmentRepository "1" ..> "*" Department
+DepartmentRepository "1" -> "1" Set
+Department "1" <- "1" Set
+DepartmentRepository "1" ..> "_departmentsList 1" IDepartmentListFactory
+IDepartmentListFactory  <|..  DepartmentListFactoryImpl
+IDepartmentFactory  <|..  DepartmentFactoryImpl
+IDepartmentListFactory  ..>  Set
+US05_RegisterADepartmentController "1  " ..> "            1\n_departmentRepo    " DepartmentRepository
+Department "1" <.. "1" IDepartmentFactory
+IDepartmentFactory "_departmentFactory1" <.. "1"  DepartmentRepository
+@enduml

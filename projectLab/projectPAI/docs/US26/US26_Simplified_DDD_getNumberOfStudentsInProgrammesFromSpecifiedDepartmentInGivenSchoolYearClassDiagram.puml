@@ -1,0 +1,126 @@
+@startuml
+
+title US26_getNumberOfStudentsInProgrammesFromSpecifiedDepartmentInGivenSchoolYear.puml
+top to bottom direction
+skinparam ranksep 100
+skinparam nodesep 100
+skinparam classBackgroundColor #E1F5FE
+skinparam linetype ortho
+
+class US26_CountStudentsInProgrammesFromDepartmentInSchoolYearController {
+    +US26_CountStudentsInProgrammesFromDepartmentInSchoolYearController( IProgrammeEditionEnrolmentRepository PEERepo,ISchoolYearRepository schoolYearRepository,IDepartmentRepository departmentRepository
+    +countStudentsInProgrammeFromDepartmentInSchoolYear(departmentID: DepartmentID, schoolYearID: SchoolYearID): int
+}
+
+'Interfaces and Repositories'
+interface IDepartmentRepository {
+    +departmentExists(DepartmentID department) :boolean
+}
+
+class DepartmentRepositoryImpl {
+    +departmentExists(DepartmentID department) :boolean
+    +findDepartmentByID(DepartmentID department) :Optional <Department>
+}
+
+interface IProgrammeRepository {
+    +findProgrammeByDepartment(DepartmentID department): List<ProgrammeID>
+}
+
+class ProgrammeRepositoryImpl {
+     +findProgrammeByDepartment(DepartmentID department): List<ProgrammeID>
+}
+
+interface IProgrammeEditionEnrolmentRepository {
+     +countStudentsInProgrammesFromDepartmentInSchoolYear(schoolYearID: SchoolYearID, List<ProgrammeID> ProgrammeIDs): int
+}
+class ProgrammeEditionEnrolmentRepository {
+    +countStudentsInProgrammesFromDepartmentInSchoolYear(schoolYearID: SchoolYearID, List<ProgrammeID> ProgrammeIDs): int
+}
+
+interface ISchoolYearRepository {
+    +schoolYearExistsByID(schoolYearID: SchoolYear): boolean
+}
+
+class SchoolYearRepository {
+    +schoolYearExistsByID(schoolYearID: SchoolYear): boolean
+}
+
+'Aggregates'
+
+package "Programme Aggregate" #LightBlue{
+    class Programme <<Root>> <<Entity>> {
+      -NameWithNumbersAndSpecialChars: NameWithNumbersAndSpecialChars
+      -quantSemesters: quantSemesters
+      -quantEcts: QuantEcts
+      -acronym: Acronym
+      -degreeTypeID: DegreeTypeID
+      -departmentID: DepartmentID
+      -programmeDirectorID: TeacherID
+    +isInDepartment ( departmentID: DepartmentID): boolean
+    +identity (): ProgrammeID
+    }
+}
+
+
+package "Department Aggregate" #LightBlue {
+    class Department <<Root>> <<Entity>> {
+    -departmentName: Name
+    -director: TeacherID
+     +getDepartmentID(): DepartmentID
+    }
+}
+
+class ProgrammeID <<Value Object>> {
+     +equals ()
+}
+class DepartmentID <<Value Object>> {
+     +equals ()
+}
+class SchoolYearID <<Value Object>> {
+     +equals ()
+}
+class ProgrammeEditionID <<Value Object>> {
+     +isSameProgrammeEdition ()
+}
+
+package "ProgrammeEditionEnrolment Aggregate" #LightBlue {
+    class ProgrammeEditionEnrolment <<Root>> <<Entity>> {
+     -programmeEditionEnrolmentID: ProgrammeEditionEnrolmentID
+     -studentID: StudentID
+     -enrolmentDate: LocalDate
+      +isEnrolmentAssociatedToProgrammeAndSchoolYear(schoolYearID: SchoolYearID, programmeIDs: List<ProgrammeID>): boolean
+      +findStudentInProgrammeEdition(): StudentID
+    }
+}
+
+
+ package "SchoolYear Aggregate" #Lightblue{
+     class SchoolYear <<Root>> <<Entity>>  {
+        -description: Description
+        -startDate: Date
+        -endDate: Date
+        +identity(): SchoolYearID
+    }
+ }
+
+ProgrammeEditionEnrolmentRepository "1" --> "1..*" ProgrammeEditionEnrolment
+ProgrammeEditionEnrolment "1" --> "1" ProgrammeEditionID
+ProgrammeEditionID "1" --> "1" ProgrammeID
+ProgrammeEditionID "1" --> "1" SchoolYearID
+SchoolYearRepository "1" --> "1..*" SchoolYear
+SchoolYear "1" --> "1 _schoolYearID" SchoolYearID
+Department "1" --> "1 _departmentID" DepartmentID
+DepartmentRepositoryImpl "1" --> "1..*" Department
+ProgrammeRepositoryImpl "1" --> "1..*" Programme
+Programme "1" --> "1 _departmentID" DepartmentID
+Programme "1" -u-> "1 _programmeID" ProgrammeID
+US26_CountStudentsInProgrammesFromDepartmentInSchoolYearController "1" ..> "1 _departmentRepository" "IDepartmentRepository"
+US26_CountStudentsInProgrammesFromDepartmentInSchoolYearController "1" ..> "1 _peeRepo" "IProgrammeEditionEnrolmentRepository"
+US26_CountStudentsInProgrammesFromDepartmentInSchoolYearController "1" ..> "1 _pRepo" "IProgrammeRepository"
+US26_CountStudentsInProgrammesFromDepartmentInSchoolYearController "1" ..> "1 _schoolYearRepository"  "ISchoolYearRepository"
+IDepartmentRepository <|.. DepartmentRepositoryImpl
+IProgrammeRepository <|.. ProgrammeRepositoryImpl
+IProgrammeEditionEnrolmentRepository <|.. ProgrammeEditionEnrolmentRepository
+ISchoolYearRepository <|.. SchoolYearRepository
+
+@enduml

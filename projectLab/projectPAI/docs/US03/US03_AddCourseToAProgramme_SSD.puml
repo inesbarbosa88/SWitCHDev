@@ -1,0 +1,17 @@
+@startuml
+actor ASC
+participant UI
+skinparam sequenceLifeLineBackgroundColor #application
+autonumber
+
+ASC -> UI ++  : I want to add Course to a Programme
+UI --> ASC : Which Programme?
+ASC -> UI : p1_ID!
+UI --> ASC : Which Course?
+ASC -> UI : course1!
+UI --> ASC : Which Curricular Year?
+ASC -> UI : 2nd!
+UI --> ASC : Which Semester?
+ASC -> UI : 1st!
+UI --> ASC -- : saved(cisp1)
+@enduml

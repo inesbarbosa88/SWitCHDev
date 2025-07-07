@@ -1,0 +1,70 @@
+@startuml
+autonumber
+
+title US06: Update Department Director Of A Department
+actor Administrator
+participant ":UI" as UI
+participant ":US06_IWantToUpdateTheDepartmentDirectorOfADepartmentController" as Controller
+participant ":IDepartmentRepository" as IDepartmentRepository
+participant ":Department" as Department
+participant ":Teacher" as Teacher
+
+
+activate Administrator #ddfada
+Administrator -> UI: I want to update the Department Director of a Department!
+activate UI #ddfada
+
+UI -> Controller: getAllDepartmentID ()
+activate Controller #ddfada
+
+ref over Controller
+    Convert departmentID to VO
+end ref
+
+Controller -> IDepartmentRepository: getDepartmentIDs ()
+activate IDepartmentRepository #ddfada
+IDepartmentRepository --> Controller: Set<DepartmentID>
+deactivate IDepartmentRepository
+
+Controller --> UI: Set<DepartmentID>
+deactivate Controller
+
+
+UI --> Administrator: Choose Department?
+Administrator -> UI: Department selected!
+UI --> Administrator: What Teacher?
+Administrator -> UI: Enter the Teacher!
+UI --> Administrator: Sure?
+Administrator -> UI: Yes!
+
+
+UI -> Controller :  updateOfDepartmentDirector (departmentID, teacherID)
+activate Controller #ddfada
+
+ref over Controller
+    Convert departmentID and teacherID to VO
+end ref
+
+Controller -> IDepartmentRepository: updateOfDepartmentDirector(departmentID, teacherID)
+activate IDepartmentRepository  #ddfada
+
+IDepartmentRepository -> Department: changeDirector (teacherID)
+activate Department #ddfada
+Department -> Teacher: isInDepartment (departmentID)
+activate Teacher #ddfada
+Teacher --> Department: True
+deactivate Teacher
+Department --> IDepartmentRepository: True
+deactivate Department
+IDepartmentRepository --> Controller: True
+deactivate IDepartmentRepository
+Controller --> UI: True
+deactivate Controller
+
+
+UI --> Administrator: OK!
+deactivate UI
+deactivate Administrator
+
+
+@enduml

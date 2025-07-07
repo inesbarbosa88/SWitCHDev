@@ -1,0 +1,100 @@
+@startuml
+actor ASC
+participant UI
+participant ":AddCourseToAProgramme\nController" as CTRL
+participant ":ServiceProgramme" as SP
+participant ":ProgrammeRepository" as PR
+participant ":ServiceStudyPlan" as SSP
+participant ":StudyPlanRepository" as SPR
+participant ":ServiceCourse" as SC
+participant ":CourseRepository" as CR
+participant ":ServiceCourseInStudyPlan" as SCSP
+participant ":Course InStudyPlanRepository" as CSPR
+participant ":FactoryCourseInStudyPlan" as FCSP
+skinparam sequenceLifeLineBackgroundColor #application
+autonumber
+
+ASC -> UI ++  : I want to add Course to a Programme
+|||
+UI -> CTRL ++ : getAllProgrammes()
+|||
+CTRL -> SP ++ : findAll()
+SP -> PR ++ : findAll()
+ref over PR
+end ref
+
+PR --> SP -- : listDomain
+SP --> CTRL -- : listDomain
+|||
+ref over CTRL
+\t\t\t\tConvert listDomain to listDTO
+
+end ref
+|||
+CTRL --> UI --:  listDTO
+
+UI --> ASC : Which Programme?
+ASC -> UI : This Programme1!
+
+UI -> CTRL ++ : getAllCourses()
+
+CTRL -> SC ++ : findAll()
+SC -> CR ++ : findAll()
+ref over CR
+
+end ref
+CR --> SC -- : listDomain
+SC --> CTRL  -- : listDomain
+|||
+ref over CTRL
+\t\t\t\tConvert listDomain to listDTO
+
+end ref
+|||
+CTRL --> UI  -- : listDTO
+
+UI --> ASC : Which Course?
+ASC -> UI : course1!
+UI --> ASC : Which Curricular Year?
+ASC -> UI : 2nd!
+UI --> ASC : Which Semester?
+ASC -> UI : 1st!
+
+UI -> CTRL ++: addCourseToProgramme\n(Semester, CurricularYear, CourseID,p1_ID)
+|||
+ref over CTRL
+\t\tConvert SemestreDTO to SemestreVO
+\t\t\t\tConvert CurricularYearDTO to CurricularYearVO
+\t\t\tConvert CourseID_DTO to CourseID_VO
+\tConvert p1ID_DTO to p1ID_VO
+
+end ref
+|||
+CTRL -> SSP ++: getLatestStudyPlanIDByProgrammeID(p1_ID)
+SSP -> SPR ++: getLatestStudyPlanIDByProgrammeID(p1_ID)
+ref over SPR
+Create
+end ref
+SPR -> SSP --: sP1_ID
+SSP -> CTRL --: sP1_ID
+CTRL-> SCSP ++  : registerCourseInStudyPlan\n(c1_ID, sp_1ID, CurricularYear, Semester)
+SCSP -> FCSP ++  : registerCourseInStudyPlan\n(c1_ID, sp_1ID, CurricularYear, Semester)
+
+create "cisp1:CourseInStudyPlan" as CISP #lightblue
+FCSP --> CISP : <create> (Semester, CurricularYear, c1_ID, sp_1ID)
+FCSP --> SCSP --:
+SCSP --> CSPR ++ : save((cisp1)
+ref over CSPR
+Create
+end ref
+CSPR --> SCSP -- : saved(cisp1)
+
+SCSP --> CTRL--: saved(cisp1)
+CTRL --> UI -- : saved(cisp1)
+UI --> ASC -- : saved(cisp1)
+
+participant "programme1:Programme"
+participant "studyPlan1:StudyPlan"
+participant "course1:Course"
+
+@enduml

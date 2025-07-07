@@ -1,0 +1,40 @@
+@startuml
+actor ProgrammeDirector
+participant ":UI" as UI
+participant ":IWantToKnowTheAverageGradeInACourseEditionCtr" as KA
+participant ":CourseEditionRepository" as CER
+participant ":StudentGradeRepository" as SG
+participant ":StudentGrade" as StudentGrade
+autonumber
+
+
+ProgrammeDirector -> UI ++ #application: I want to know average grade of Course Edition
+UI --> ProgrammeDirector -- : Course Edition?
+ProgrammeDirector -> UI ++ #application: Course Edition1!
+UI -> KA ++ #application : IWantToKnowTheAvg(courseEdition1)
+KA -> CER ++ #application : identity (courseEdition1)
+CER -> KA :  :ceIdVO1
+deactivate CER
+KA -> SG ++ #application : getApprovalRate(:ceIdVO1)
+
+ SG -> SG : Average = 0
+loop for each StudentGrade in SG
+    SG -> StudentGrade : hasThisCourseEdition(:ceIdVO1)
+    activate StudentGrade #application
+    StudentGrade --> SG : True!
+    deactivate StudentGrade
+
+    SG -> StudentGrade : knowGrade()
+    activate StudentGrade #application
+    StudentGrade --> SG : (double) grade
+    deactivate StudentGrade
+     SG -> SG : Calculate Average Grade
+end
+
+
+
+SG --> KA --: Average Grade of courseEdition1
+KA --> UI --: Average Grade of courseEdition1
+UI --> ProgrammeDirector --: Average Grade of courseEdition1
+
+@enduml

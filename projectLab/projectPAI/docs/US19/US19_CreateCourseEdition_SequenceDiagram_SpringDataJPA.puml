@@ -1,0 +1,100 @@
+@startuml
+title: US19_CREATE COURSE EDITION - UPDATED SEQUENCE DIAGRAM
+autonumber
+
+actor ASC
+participant ":UI" as UI
+participant ":CreateCourseEditionController" as Controller
+participant ":DegreeTypeRepository" as DegreeTypeR
+participant ":ProgrammeRepository" as ProgrammeR
+participant ":StudyPlanRepository" as StudyPlanR
+participant ":CourseInStudyPlanRepository" as CourseInStudyPlanR
+participant ":ProgrammeEditionRepository" as ProgrammeEditionR
+participant ":CourseEditionService" as Service
+participant ":CourseEditionFactory" as Factory
+participant ":CourseEditionMapper" as Mapper
+participant ":CourseEditionRepositorySpringData" as Repository
+participant ":CourseEditionIDMapper" as IDMapper
+participant ":ProgrammeEditionIdMapper" as PEMapper
+participant ":CourseInStudyPlanIDMapper" as CSPMapper
+
+
+ASC -> UI ++ #application :  I want to create a Course Edition
+UI -> Controller ++ #application: getAllDegreeTypes()
+Controller -> DegreeTypeR ++ #application: getAllDegreeTypes()
+DegreeTypeR --> Controller -- : dTL1
+Controller --> UI -- : dTL1
+UI --> ASC -- : Which Degree Type?
+
+
+ASC -> UI ++ #application : Degree Type 1!
+UI -> Controller ++ #application: getProgrammesByDegreeTypeID(dT1)
+Controller -> ProgrammeR ++ #application: getProgrammesByDegreeTypeID(dT1ID)
+ProgrammeR --> Controller -- : pL1
+Controller --> UI -- : pL1
+UI --> ASC -- : Which Programme?
+
+
+ASC -> UI ++ #application : Programme 1!
+UI -> Controller ++ #application: getCoursesInStudyPlanByProgrammeID(p1_ID)
+Controller -> StudyPlanR ++ #application: getLatestStudyPlanIDByProgrammeID(p1_ID)
+StudyPlanR --> Controller -- : sP1_ID
+Controller -> CourseInStudyPlanR ++ #application: getCoursesInStudyPlanByStudyPlanID(sP1_ID)
+CourseInStudyPlanR --> Controller -- : cSpL1
+Controller --> UI -- : cSpL1
+UI --> ASC -- : Which Course From the Study Plan?
+
+
+ASC -> UI ++ #application : Course In Study Plan 1!
+UI -> Controller ++ #application: getProgrammeEditionsByProgrammeID(p1_ID)
+Controller -> ProgrammeEditionR ++ #application: getAllProgrammeEditions(p1_ID)
+ProgrammeEditionR --> Controller -- : pEL1
+Controller --> UI -- : pEL1
+UI --> ASC -- : Which Programme Edition?
+
+
+ASC -> UI ++ #application : Programme Edition 1!
+
+
+UI -> Controller ++ #application : createCourseEdition(cSp1_ID, pE1_ID)
+Controller -> Service ++ #application: createCourseEdition(cSp1_ID, pE1_ID)
+
+
+Service -> Factory ++ #application : newCourseEdition(cSp1_ID, pE1_ID)
+Factory --> Service -- : CourseEdition
+
+
+Service -> Mapper ++ #application : toDataModel(courseEdition)
+Mapper -> IDMapper ++ #application : toDataModel(courseEditionID)
+IDMapper -> PEMapper ++ #application : toDataModel(programmeEditionID)
+PEMapper --> IDMapper -- : ProgrammeEditionIdDataModel
+IDMapper -> CSPMapper ++ #application : toDataModel(courseInStudyPlanID)
+CSPMapper --> IDMapper -- : CourseInStudyPlanIDDataModel
+IDMapper --> Mapper -- : CourseEditionIDDataModel
+Mapper --> Service -- : CourseEditionDataModel
+
+
+Service -> Repository ++ #application : save(courseEditionDataModel)
+Repository --> Service -- : CourseEditionDataModel
+
+
+Service -> Mapper ++ #application : toDomain(courseEditionDataModel)
+Mapper --> Service -- : CourseEdition
+
+Service --> Controller -- : CourseEdition
+Controller --> UI -- : True
+UI --> ASC -- : True
+
+
+participant "dTL1\n:List<DegreeType>" as DTL
+participant "dT1ID\n:DegreeTypeID" as DT_ID
+participant "pL1\n:List<Programme>" as PL
+participant "p1ID\n:ProgrammeID" as PG_ID
+participant "cSpL1\n:List<CourseInStudyPlan>" as CSPL
+participant "cSp1_ID\n:CourseInStudyPlanID" as CSP_ID
+participant "pEL1\n:List<ProgrammeEdition>" as PEL
+participant "pE1_ID\n:ProgrammeEditionID" as PE_ID
+participant "cSP1_ID\n:CourseInStudyPlanID" as CSP_ID
+participant "pE1_ID\n:ProgrammeEditionID" as PE_ID
+
+@enduml

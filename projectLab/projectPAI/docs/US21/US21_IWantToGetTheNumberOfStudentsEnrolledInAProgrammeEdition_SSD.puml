@@ -1,0 +1,12 @@
+@startuml
+title: US21_GET_THE_NUMBER_OF_STUDENTS_ENROLLED_IN_A_PROGRAMME_EDITION_SEQUENCE SYSTEM DIAGRAM
+autonumber
+
+actor ASC
+participant SYSTEM
+ASC -> SYSTEM:  I want to get the number of students enrolled in a programme edition!
+SYSTEM --> ASC -- : Which programme edition?
+ASC -> SYSTEM: This programme edition!
+SYSTEM --> ASC -- : Number of Students!
+
+@enduml

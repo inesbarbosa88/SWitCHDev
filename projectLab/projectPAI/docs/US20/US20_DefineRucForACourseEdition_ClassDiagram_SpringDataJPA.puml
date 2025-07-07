@@ -1,0 +1,101 @@
+@startuml
+
+skinparam linetype ortho
+skinparam ranksep 50
+skinparam nodesep 100
+
+' Presentation Layer
+class US20_DefineRucForCourseEditionController {
+  - service: ICourseEditionApplicationService
+  + getTeachers()
+  + getCourseEditions()
+  + defineRucForCourseEdition(courseEditionID: CourseEditionID, teacherID: TeacherID)
+}
+
+' Application Layer
+interface ICourseEditionApplicationService {
+  + assignRucToCourseEdition(courseEditionID: CourseEditionID, teacherID: TeacherID): boolean
+  + getAllTeachers(): Iterable<Teacher>
+  + getAllCourseEditions(): Iterable<CourseEdition>
+}
+
+class CourseEditionApplicationService {
+  - courseEditionRepository: ICourseEditionRepository
+  - teacherRepository: ITeacherRepository
+  + assignRucToCourseEdition(courseEditionID: CourseEditionID, teacherID: TeacherID): boolean
+  + getAllTeachers(): Iterable<Teacher>
+  + getAllCourseEditions(): Iterable<CourseEdition>
+}
+
+' Domain Layer
+interface ICourseEditionRepository {
+  + ofIdentity(id: CourseEditionID): Optional<CourseEdition>
+  + save(courseEdition: CourseEdition): CourseEdition
+}
+
+interface ITeacherRepository {
+  + ofIdentity(id: TeacherID): Optional<Teacher>
+  + findAll(): Iterable<Teacher>
+}
+
+class CourseEdition {
+  - id: CourseEditionID
+  - ruc: Teacher
+  + setRuc(teacher: TeacherID): boolean
+}
+
+class Teacher {
+  - id: TeacherID
+}
+
+' Infrastructure Layer
+class CourseEditionRepositoryImpl {
+  - springDataRepo: SpringCourseEditionJpaRepository
+  - mapper: CourseEditionMapper
+  + save(...)
+  + ofIdentity(...)
+}
+
+class TeacherRepositoryImpl {
+  - springDataRepo: SpringTeacherJpaRepository
+  - mapper: TeacherMapper
+  + ofIdentity(...)
+  + findAll()
+}
+
+interface SpringCourseEditionJpaRepository <<JpaRepository>>
+interface SpringTeacherJpaRepository <<JpaRepository>>
+
+class CourseEditionJpa <<JPA Entity>>
+class TeacherJpa <<JPA Entity>>
+
+class CourseEditionMapper
+class TeacherMapper
+
+' Associations
+US20_DefineRucForCourseEditionController --> ICourseEditionApplicationService
+ICourseEditionApplicationService <|.. CourseEditionApplicationService
+
+CourseEditionApplicationService --> ICourseEditionRepository
+CourseEditionApplicationService --> ITeacherRepository
+
+ICourseEditionRepository <|.. CourseEditionRepositoryImpl
+ITeacherRepository <|.. TeacherRepositoryImpl
+
+CourseEditionRepositoryImpl --> CourseEditionMapper
+TeacherRepositoryImpl --> TeacherMapper
+
+CourseEditionRepositoryImpl --> SpringCourseEditionJpaRepository
+TeacherRepositoryImpl --> SpringTeacherJpaRepository
+
+SpringCourseEditionJpaRepository --> CourseEditionJpa
+SpringTeacherJpaRepository --> TeacherJpa
+
+CourseEditionMapper --> CourseEditionJpa
+TeacherMapper --> TeacherJpa
+
+ICourseEditionRepository ..> CourseEdition
+ITeacherRepository ..> Teacher
+CourseEdition --> Teacher
+
+@enduml

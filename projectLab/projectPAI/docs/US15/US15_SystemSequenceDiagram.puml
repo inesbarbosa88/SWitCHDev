@@ -1,0 +1,17 @@
+@startuml
+skinparam sequenceMessageAlign center
+
+title US15: I want to update a teacher's working percentage
+actor HRC
+participant ":System" as System
+
+HRC -> System: I want to update Teacher's working percentage
+System --> HRC: Which Teacher?
+HRC -> System: Teacher's acronym
+System --> HRC: What working percentage?
+HRC -> System: Working percentage!
+System --> HRC: What date?
+HRC -> System: Date!
+System --> HRC: Ok!
+
+@enduml
