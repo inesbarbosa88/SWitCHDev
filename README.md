@@ -25,11 +25,13 @@ The programme utilizes industry-standard tools and technologies, including:
 - **Jenkins**
 - **Docker**
 - **SQL**
+- **...**
+
 
 ## Objectives
 
-This repository serves as a collection of materials, exercises, and projects created throughout the programme, with the hope that it will be a valuable study resource for those considering or currently undertaking an IT reconversion.
-
+This repository serves as both a study archive and a portfolio, showcasing the knowledge and skills acquired throughout one year of requalification and specialization in Software Development. 
+It aims to reflect my learning journey, practical experience, and growing competence across the various areas covered in the Switch Dev Programme.
 ## Contents
 
 - Study notes and resources related to each area of competence.
